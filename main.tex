@@ -1,0 +1,1642 @@
+\documentclass[12pt,a4paper]{report}
+%\documentclass[14pt,a4paper]{extreport}
+\usepackage[titletoc]{appendix}
+\usepackage{enumitem}
+\usepackage{calc}
+\usepackage{setspace}
+\usepackage{multicol}
+
+\onehalfspacing % Adjusted line spacing
+
+\usepackage[utf8]{inputenc}
+\usepackage[style=authoryear, sorting=nyt, maxcitenames=1]{biblatex}
+\usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amssymb}
+\usepackage{upgreek}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{bm}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{longtable,color,caption}
+\usepackage{fancyhdr} % For custom headers and footers
+\renewcommand{\contentsname}{Table of Contents}
+\graphicspath{{img/}}
+
+\usepackage{float} % for figure placement
+
+% acronyms
+\usepackage[nolist,nohyperlinks]{acronym}
+\acrodef{2d}[2D]{two-dimensional}
+\acrodef{3d}[3D]{three-dimensional}
+\acrodef{ac}[AC]{articular cartilage}
+\acrodef{ae}[AE]{autoencoder}
+\acrodef{ai}[AI]{artificial intelligence}
+\acrodef{cr}[CR]{compression ratio}
+\acrodef{dl}[DL]{deep learning}
+\acrodef{dz}[DZ]{deep zone}
+\acrodef{ml}[ML]{machine learning}
+\acrodef{mo}[MO]{material optimization}
+\acrodef{mor}[MOR]{model order reduction}
+\acrodef{mse}[MSE]{mean squared error}
+\acrodef{mz}[MZ]{middle zone}
+\acrodef{fe}[FE]{finite element}
+\acrodef{ffnn}[FFNN]{feed-forward neural network}
+\acrodef{fpbbs}[FPBBS]{fixed-point-based backward scheme}
+\acrodef{gnn}[GNN]{graph neural network}
+\acrodef{hf}[HF]{high-fidelity}
+\acrodef{hirl}[HIRL]{hybrid inductive representation learning}
+\acrodef{hml}[HML]{hybrid \ac{ml}}
+\acrodef{lf}[LF]{low-fidelity}
+\acrodef{pmse}[PMSE]{pointwise \ac{mse}}
+\acrodef{psa}[PSA]{pre-stressing algorithm}
+\acrodef{sz}[SZ]{superficial zone}
+%
+
+\addbibresource{ref.bib}
+
+% Adjust the page dimensions
+\geometry{top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1.5cm}
+    \textsc{FREE UNIVERSITY OF BOZEN-BOLZANO}\par
+    \textsc{FACULTY OF ENGINEERING}\par
+    \vspace{2.5cm}
+    {\LARGE\bfseries Hybrid Machine Learning and Numerical Analysis of Cartilage Biomechanics\par}
+    \vspace{2cm}
+    A dissertation submitted in partial fulfillment\par
+    of the requirements for the degree of\par
+    \vspace{0.5cm}
+    {\Large Doctor of Philosophy in Computer Science\par}
+    \vspace{2.5cm}
+    by\par
+    \vspace{0.5cm}
+    {\Large \textbf{Seyed Shayan Sajjadinia}\par}
+    \vspace{3cm}
+    Supervised by Prof. Bruno Carpentieri\par
+    Co-supervised by Prof. Gerhard A. Holzapfel\par
+    \vspace{1.5cm}
+    February 2024
+\end{titlepage}
+
+% A blank page with no page number
+\thispagestyle{empty}
+\mbox{}
+\clearpage
+
+
+% Dedication
+\chapter*{}
+\ldots dedicated to my beloved parents.
+
+\pagenumbering{Roman}
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+To be added...
+
+\noindent
+\textbf{Keywords}: Articular cartilage, knee biomechanics, finite element analysis, surrogate modeling, machine learning.
+
+
+\chapter*{Acknowledgements}
+\addcontentsline{toc}{chapter}{Acknowledgements}
+%
+I would like to express my deepest appreciation to my supervisors, Prof. Bruno Carpentieri and Prof. Gerhard A. Holzapfel, for their invaluable guidance and mentorship during my research journey. Their expertise and encouragement were not only pivotal in sparking my initial ideas but also played a crucial role in the growth and refinement of my work, greatly influencing the direction and depth of my papers. I am immensely grateful for their consistent support and joint authorship of the publications associated with this study, which has undoubtedly elevated the quality of my academic work.
+
+Furthermore, my heartfelt thanks go to Prof. Shriram Duraisamy for his valuable contributions to the numerical aspects of my research and his co-authorship on two of the related publications. Lastly, I extend my sincere gratitude to the Free University of Bozen-Bolzano for their generous financial support and for providing the vital resources and educational programs that have been instrumental in advancing my project.
+
+\chapter*{Research Outputs}
+\addcontentsline{toc}{chapter}{Research Outputs}
+This work is based on the following relevant research outputs:
+%
+\begin{itemize}
+\item \textbf{Journal papers}:
+\begin{itemize}
+    \item Sajjadinia, S.S., B. Carpentieri, and G.A. Holzapfel (2021). “A backward pre-stressing algorithm for efficient finite element implementation of in vivo material and geometrical parameters into fibril-reinforced mixture models of articular cartilage”. In: \textit{Journal of the Mechanical Behavior of Biomedical Materials} 114, p. 104203. issn: 1751-6161.
+    \item Sajjadinia, S.S., B. Carpentieri, D. Shriram, and G.A. Holzapfel (2022). “Multi-fidelity surrogate modeling through hybrid machine learning for biomechanical and finite element analysis of soft tissues”. In: \textit{Computers in Biology and Medicine} 148, p. 105699. issn: 0010-4825.
+    \item Sajjadinia, S.S., B. Carpentieri, and G.A. Holzapfel (under review). “Bridging diverse physics and scales of knee cartilage with efficient graph learning”.
+\end{itemize}
+\item \textbf{Conference proceedings papers}:
+\begin{itemize}
+    \item Sajjadinia, S.S., B. Carpentieri, and G.A. Holzapfel (2021). “A Pointwise Evaluation Metric to Visualize Errors in Machine Learning Surrogate Models”. In: \textit{Proceedings of CECNet 2021}. Ed. by A.J. Tall\'{o}n-Ballesteros. Vol. 345. Frontiers in Artificial Intelligence and Applications. IOS Press, pp. 26–34.
+    \item Sajjadinia, S.S., B. Carpentieri, and G.A. Holzapfel (in press). “Large-scale finite element modeling of pre-stress in articular cartilage”. In: \textit{CMBBE 2023: Lecture Notes in Computational Vision and Biomechanics}.
+\end{itemize}
+\item \textbf{Invited book chapter}:
+\begin{itemize}
+    \item Sajjadinia, S.S., B. Carpentieri, and G.A. Holzapfel (in press). “Hybrid data-driven and numerical modeling of articular cartilage”. In: \textit{Big Data Analysis and Artificial Intelligence for Medical Sciences}. Ed. by B. Carpentieri and P. Lecca. In press. Wiley.
+\end{itemize}
+\begin{samepage}
+\item \textbf{Talk abstracts}:
+\begin{itemize}
+    \item Sajjadinia, S.S., B. Carpentieri, D. Shriram, and G.A. Holzapfel (2021). “Biomechanical modeling of soft tissue multiphysics using hybrid machine learning and finite element analysis”. \textit{17th International Symposium on Computer Methods in Biomechanics and Biomedical Engineering}. Online.
+    \item Sajjadinia, S.S., B. Carpentieri, and G.A. Holzapfel (2023). “Bridging tissue-scale multi-physics to organ-scale biomechanics through multi-fidelity machine learning”. \textit{18th International Symposium on Computer Methods in Biomechanics and Biomedical Engineering}. Paris, France.
+\end{itemize}
+\end{samepage}
+\item \textbf{Poster abstracts}:
+\begin{itemize}
+    \item Sajjadinia, S.S., B. Carpentieri, and G.A. Holzapfel (2021). “A pointwise evaluation metric to visualize errors in machine learning surrogate models”. \textit{The 3rd International Conference on Machine Learning and Intelligent Systems}. Online.
+    \item Sajjadinia, S.S., B. Carpentieri, and G.A. Holzapfel (2023). “Large-scale finite element modeling of pre-stress in articular cartilage”. \textit{18th International Symposium on Computer Methods in Biomechanics and Biomedical Engineering}. Paris, France.
+\end{itemize}
+\item \textbf{Research Data}:
+\begin{itemize}
+    \item Sajjadinia, S.S. (2021). “PMSE: Pointwise mean squared error”. Data corresponding to chapter 2, available at \href{https://github.com/shayansss/pmse}{github.com/shayansss/pmse}.
+    \item Sajjadinia, S.S. (2022). “HML: Hybrid machine learning”. Data corresponding to chapter 4, available at \href{https://github.com/shayansss/hml}{github.com/shayansss/hml}.
+    \item Sajjadinia, S.S. (2023). “PSA: Pre-stress algorithm”. Data corresponding to chapter 3, available at \href{https://github.com/shayansss/psa}{github.com/shayansss/psa}.
+    \item Sajjadinia, S.S. (2024). “HIRL: Hybrid inductive representation learning”. Data corresponding to chapter 5, available at \href{https://github.com/shayansss/hirl}{github.com/shayansss/hirl}.
+\end{itemize}
+\end{itemize}
+
+\clearpage
+
+\tableofcontents
+\newpage
+
+\listoffigures\addcontentsline{toc}{chapter}{List of Figures}
+\newpage
+
+\listoftables\addcontentsline{toc}{chapter}{List of Tables}
+\newpage
+
+\chapter*{List of Acronyms}\addcontentsline{toc}{chapter}{List of Acronyms}
+%
+%\begin{multicols}{2}
+\begin{description}[itemindent=80pt,labelwidth=80pt]
+    \item[2D] Two-Dimensional
+    \item[3D] Three-Dimensional
+    \item[AC] Articular Cartilage
+    \item[AI] Artificial Intelligence
+    \item[DL] Deep Learning
+    \item[DZ] Deep Zone
+    \item[FE] Finite Element
+    \item[FFNN] Feed-Forward Neural Network
+    \item[FPBBS] Fixed-Point-Based Backward Scheme
+    \item[GNN] Graph Neural Network
+    \item[HF] High-Fidelity
+    \item[HIRL] Hybrid Inductive Representation Learning
+    \item[HML] Hybrid Machine Learning
+    \item[LF] Low-Fidelity
+    \item[ML] Machine Learning
+    \item[MO] Material Optimization
+    \item[MOR] Model Order Reduction
+    \item[MSE] Mean Squared Error
+    \item[MZ] Middle Zone
+    \item[PMSE] Pointwise Mean Squared Error
+    \item[PSA] Pre-Stressing Algorithm
+    \item[SZ] Superficial Zone
+\end{description}
+%\end{multicols}
+
+% Start page numbering with Arabic numerals
+\pagenumbering{arabic}
+
+% Sample Chapters
+\chapter{Introduction}
+
+\Ac{ac}, a soft tissue that provides smooth load-bearing between articulating bones with excellent lubrication, allows for pain-free movement. This tissue, under normal conditions, shows remarkable shock-absorbing properties and resistance [\cite{lu2008}]. However, biomechanical factors, such as extreme loads on the tissue, can cause significant damage to it, leading to substantial health care expenditures [\cite{salmon2016}]. Understanding the biomechanics of cartilage is therefore crucial, particularly for early damage detection or prevention [\cite{moreno2019}].
+
+In this regard, \ac{ai}, or more precisely \ac{ml}, has been widely adopted. Recent research has demonstrated progress in various aspects: detection of damage via biomechanical markers [\cite{alunnicardinali2023}], location-dependent material characterization of cartilage [\cite{niasar2023}], and prediction of the tissue's fibrillar orientation [\cite{mirmojarabian2023}]. Nonetheless, gathering clinical or experimental data for generating (training) these \ac{ml} models remains a significant hurdle, leading to a preference for physics models (which, due to their complexity, are commonly approximated by numerical approaches).
+
+\ac{fe} modeling, a prominent type of numerical modeling in this context, breaks down the complex physics domain into smaller, manageable elements, used for numerical approximation of the solution. This method is applied in diverse scenarios, such as simulating the fibrillar orientation [\cite{sajjadinia2021b}], and analyzing the hyperphysiological (potentially damaging) compression [\cite{occhetta2019}], and image-based modeling in human joints [\cite{thienkarochanakul2020}]. Despite their effectiveness, these methods involve iterative algorithms that can be computationally intensive, with processing times ranging from minutes to even days [\cite{donahue2002,kazemi2011,naghibi2016,wang2018b,lorza2021}].
+
+To mitigate the high computational demands of the numerical methods, ac{ml} has been commonly employed to develop data-driven replacements of numerical models, known as surrogates. These surrogate models, which are trained on the numerically generated data samples, can significantly reduce computation time, as demonstrated in multitudes of cartilage studies [\cite{paiva2012,arbabi2016a,arbabi2016b,egli2021}]. Despite these advantages, they still face significant limitations, including a lack of generalizability and the need for a large number of training samples (which leads to an oversimplification of the numerical model to efficiently generate them). Addressing these issues is the main motivation for this work.
+
+The aim of this project is to develop a new computer simulation tool that balances computational cost and the fidelity of a numerical model across various scales. To achieve this, the complex mathematical models will be optimized for efficient and advanced implementation of key cartilage physics while maintaining sufficient accuracy. Subsequently, highly efficient machine learning \ac{ml} surrogates will be developed to expedite simulations, overcoming the aforementioned limitation. Accordingly, the research questions posed are as follows:
+%
+\begin{enumerate}
+    \item How can a complex multi-physics model of cartilage biomechanics be implemented efficiently enough to generate the required training datasets?
+    \item How can machine learning techniques be integrated into the numerical model for efficient surrogate modeling?
+    \item Is the new machine learning system scalable and generalizable across different scales?
+    \item What are the potential implications of the proposed methods for future research?
+\end{enumerate}
+
+
+Two major innovative ideas are proposed in this project, including the multi-fidelity machine-learning-based cartilage model and the efficient multi-physics model needed for training it as distinct from the former cartilage studies that either targeted more at the high-fidelity learning methods or purely numerical models (which are expensive). This research would be a considerable contribution to a series of studies, aiming at proposing a feasible algorithm for the efficient analysis of cartilage. Thus, the results of this study can be published in leading venues.
+
+
+\chapter{Review of Preliminaries}
+This work draws from diverse disciplines, each of which may be the primary focus of distinct research groups. Recognizing that many readers might not be thoroughly versed in all these areas, this chapter aims to present an overview of the foundational concepts, with the assumption that readers have a basic understanding of tensor calculus [\cite{fleisch2011}], linear algebra [\cite{strang2023}], and stochastic programming [\cite{birge2011}]. The opening section elucidates the principles of cartilage biomechanics, exploring both joint scale and tissue scale properties. Subsequent sections delve into the intricacies of implicit \ac{fe} analysis and its mathematical intricacies that are used to generate the datasets. The final section unfolds machine learning techniques, highlighting their prominence in this context. This chapter is finished, by implementing a simplified and educational example.
+
+\section{Cartilage Biomechanics}
+\subsection{Joint-Scale Properties}
+The human knee is a complex structure, considering that it houses the tibiofemoral joint, the largest human joint. This joint is a union of the femur and tibia bones, intertwined with cartilage, ligaments, and menisci (Fig.~\ref{knee}).
+These are the soft tissues that safeguard the joint from abnormal movements and potential harm, stabilizing the joint movement and reducing the concentrated pressure [\cite{walker1975,mameri2022}]. This unique cam-shape design, perfected by evolution, accommodates the asymmetrical and complex musculoskeletal movements executed by the human body [\cite{dye1987,goldblatt2003}]. Nonetheless, damage to each of these tissues, might induce cartilage degeneration, known as osteoarthritis.
+%
+\begin{figure}
+\centering
+\includegraphics[width=0.7\linewidth]{knee.jpg}
+\caption{Main substructures of a tibiofemoral model shown in different colors.
+\label{knee}}
+\end{figure}
+
+Osteoarthritis is a degenerative ailment that affects cartilage, causing pain, discomfort, and eventual joint malfunction [\cite{lespasio2017}]. Predominantly seen in older individuals, especially women, this condition exerts considerable strain on health organizations due to its socioeconomic implications [\cite{Chen2012,gillian2019}]. Multiple factors, ranging from genetics to lifestyle choices, contribute to its onset [\cite{loeser2016,mobasheri2017,astephen2021}]. To analyze this disease, it's essential to first understand cartilage biomechanics regardless of its damage. Consequently, a significant portion of the research, including this study, has focused on this aspect [\cite{kong2022}].
+
+Similarly to other connective tissues, the functional attributes of \ac{ac} predominantly stem from its extracellular elements, particularly proteoglycans and collagen network [\cite{culav1999,brody2015}]. Given this, biomechanical investigations heavily concentrate on modeling how these elements interplay [\cite{klika2016,ebrahimi2019,sajjadinia2019,lin2021,paz2022}]. This topic is further explored in the succeeding subsection.
+
+\subsection{Tissue-Scale Properties}
+\Ac{ac} is an intricate mix of solid and fluid constituents. Around $60-80\%$ of the tissue is water, brought about by the cartilage's osmotic pressure (caused by proteoglycans) and its porous architecture [\cite{cederlund2022}]. This water content doesn't just ensure smooth lubrication on the cartilage surface but also presents formidable resistance against applied loads on tissue, more than most other microstructural components [\cite{quiroga2017,sajjadinia2019}]. Therefore, it is common to assume a biphasic composition forms \ac{ac} with a fluid phase (water) and an effective solid phase (solid components with other biomechanical parameters like osmotic pressure).
+
+Aggrecans, the most prevalent cartilage proteoglycans, are attached to hyaluronic acid chains, creating aggregates within the collagen network. Owing to its glycosaminoglycan components, these aggregates carry fixed negative charges. This establishes a chemical gradient, causing water attraction through the osmosis mechanism, explaining the presence of water in the tissue [\cite{kiani2002,gomez2020,johnson2021}]. This results in the above-mentioned osmotic pressure which, by counteracting external forces, plays a role in the tissue's load-bearing ability. Furthermore, this internal pressure increases tissue size and stretches the collagen fibrils, resulting in reversible tissue deformation and higher stiffness [\cite{dudhia2005}].
+
+\begin{figure}
+\centering
+\includegraphics[width=0.9\linewidth]{arcade.jpg}
+\caption{In the \emph{in vivo} state of a circular cartilage plug, the angle between the radial axis and one of the primary fibrils is denoted as 
+$\uptheta$ for illustration, based on \cite{benninghoff1925} and \cite{wilson2004a} studies.
+\label{arcade}}
+\end{figure}
+%
+The extracellular matrix is reinforced by collagen fibrils, which protect \ac{ac} against tensile strains. This is analogous to the reinforcement provided by structural cables, marking it as another significant solid component to consider [\cite{laurent2007,bielajew2020}]. These fibrils can be categorized into primary (anisotropic) and secondary (isotropic) groups [\cite{clark1985,wilson2004a}]. The latter, in healthy tissue, run in all spatial directions, while the former have an arcade-like orientation (Fig.~\ref{arcade}), starting vertically from the deeper \ac{ac} sections and undergoing a mid-course twist to run parallel to the cartilage surface [\cite{wilson2004a}]. These superficial fibrils help protect the surface from shear stresses [\cite{shirazi2008,motavalli2014}]. Therefore, these fibrillar bundles are commonly integrated into mathematical models of cartilage, along with the aforementioned components, as will be discussed in the next section.
+
+\section{Physics-Based Modeling}
+\subsection{Governing Equations}
+In physics-based modeling of \ac{ac}, inertia and weight are often overlooked due to the tissue's low-density structure [\cite{pearle2005}]. Newton's second law suggests that any force applied to the tissue, or surface traction, will reach equilibrium with other applied forces, leading to cartilage deformation. Below is a simplified representation of the 3D equilibrium equation for this phenomenon:
+%
+\begin{equation}
+    \int_s \mathbf{T} {\rm d}S = \mathbf{0},
+\end{equation}
+%
+where the surface area of the deformed solid material is $S$, and the associated traction on this surface, $\mathbf{T}$, is related to the full Cauchy stress tensor $\boldsymbol{\sigma}_{\rm T}$ as:
+%
+\begin{equation}\label{eq-traction}
+    \mathbf{T} = \boldsymbol{\sigma}_{\rm T} \cdot \textbf{n},
+\end{equation}
+%
+with $\textbf{n}$ being the external normal to the surface. The stress tensor provides a general view of how forces are distributed at each location. Assuming stress as a field parameter and according to the divergence theorem, the flux of the field on a closed surface can be correlated to the field's spatial divergence within the volume. Thus:
+%
+\begin{equation}
+    \int_S \boldsymbol{\sigma}_{\rm T} \cdot \textbf{n} {\rm d}S = \int_V \nabla_\textbf{x} \boldsymbol{\sigma}_{\rm T} {\rm d}V,
+\end{equation}
+%
+where $\nabla_\textbf{x}$ denotes the gradient operator with respect to the position vector after deformation, i.e., $\textbf{x}$. From this, the following differential equation can be deduced without integration [\cite{gerhard-book}]:
+%
+\begin{equation}\label{eq-strong}
+    \nabla_\textbf{x} \boldsymbol{\sigma}_{\rm T} = \textbf{0}.
+\end{equation}
+
+For considering the biomechanical role of the fluid phase, the continuity equation can be used. It implies that the rate of change of fluid within the tissue is equal to the amount passing the boundary, based on the premise that \ac{ac} is a water-saturated porous medium:
+%
+\begin{equation}
+    \frac{{\rm d}}{{\rm d}t}\left ( \int_V \rho \phi^{\rm F} {\rm d}V \right ) + \int_S \rho \phi^{\rm F} \textbf{n} \cdot \textbf{v}_{\rm r} {\rm d}S = 0,
+\end{equation}
+%
+where $\textbf{v}{\rm r}$ is the relative fluid velocity with respect to the solid framework, $\rho$ represents fluid mass density, and $\phi^{\rm F}$ is the local fluid volume fraction. By inserting the volume ratio $J$ in the first term (to account for the solid phase deformation) and applying the divergence theorem to the second term, we get the following partial differential equation:
+%
+\begin{equation}\label{eq-pde}
+    \frac{1}{J}\frac{{\rm d}}{{\rm d}t}\left (J\rho \phi^{\rm F} \right ) + \nabla \cdot \left ( \rho \phi^{\rm F} \textbf{v}_{\rm r} \right ) = 0.
+\end{equation}
+%
+In the next step, the material (constitutive) equations will be defined using finite strain theory, as explained in the following reference [\cite{gerhard-book}].
+
+We assume that $\nabla_\mathbf{X}$ is the gradient operator with respect to the position vector before deformation, $\mathbf{X}$. If $\mathbf{I}$ represents the identity tensor, then the deformation gradient $\mathbf{F}$ is:
+%
+\begin{equation}
+    \mathbf{F} = \nabla_\mathbf{X} \mathbf{u} + \mathbf{I}.
+\end{equation}
+%
+This second-order tensor is a metric of relative deformation, which can be split into an rotation tensor $\mathbf{R}$ and a symmetric tensor that is left stretch tensor $\mathbf{V}$:
+%
+\begin{equation}
+    \mathbf{F} = \mathbf{V} \mathbf{R}. \label{eq1-1}
+\end{equation}
+%
+To eliminate the effects of rigid body rotation on tissue stress and deformation (since inertia effects are ignored), we use the orthogonality of the rotation tensor, i.e., $\mathbf{R}^{\rm T}\mathbf{R} = \mathbf{I}$. Accordingly, the left Cauchy-Green deformation tensor $\mathbf{B}$ is defined to encompass only the stretches, as follows:
+%
+\begin{equation}
+\mathbf{B} = \mathbf{F} \mathbf{F}^{\rm T} = \mathbf{V}^2.
+\end{equation}
+%
+In this way, the volume ratio can also be determined as:
+%
+\begin{equation}
+J = \sqrt{\det \mathbf{B}}.
+\end{equation}
+%
+Next, the logarithmic strain, denoted as $\bm{\epsilon}$, serves as another measure of deformation and is defined by:
+%
+\begin{equation}
+\bm{\epsilon} = \ln \mathbf{B}.
+\end{equation}
+%
+Subsequently, the simplest constitutive model can be used with the (material-dependent) elasticity tensor $\mathcal{C}$, as follows:
+%
+\begin{equation}
+\bm{\sigma} := \mathcal{C} : \bm{\epsilon}.
+\end{equation}
+%
+This relationship is recognized as the Hookean model, which assumes a linear and isotropic relationship between the strain and stress values. A superior alternative is the nearly incompressible neo-Hookean model, which exhibits some nonlinearity during extensive deformations akin to rubber-like materials:
+%
+\begin{equation}\label{eq-hyperelastic}
+\bm{\sigma} :=\frac{2}{J}
+\bm{F}\frac{\partial\Psi}{\partial\bm{C}}\bm{F}^{\rm T},
+\quad \text{where }
+\Psi = C_{10}(\bar{I}_1 - 3) + \frac{1}{D_1}(J - 1)^2.
+\end{equation}
+%
+Here, $\Psi$ represents the empirically defined strain-energy function. The right Cauchy–Green tensor is denoted by \( \mathbf{C} \) and is related by the equation \( \mathbf{C} = \mathbf{F}^{\top} \mathbf{F} \). Moreover, the first invariant of the deviatoric part of \( \mathbf{C} \) is represented as \( \bar{I}_1 \). Notably, this stress definition does not account for the different cartilage phases essential for achieving \ac{hf} results [\cite{gerhard-book}].
+
+To model the interaction between the solid and fluid phases, we employ the well-recognized porous media theory in conjunction with Darcy's law. This law posits that the fluid transition from an area of elevated pressure to one of diminished pressure is determined by the constitutive behavior, such as the dynamic viscosity $\mu$, i.e., the fluid's inherent resistance to flow [\cite{karl1943,fa1979}]:
+%
+\begin{equation}\label{eq-darcy}
+    \phi^F \mathbf{v}_{\rm r} = -\frac{1}{\mu }\mathbf{K} \cdot \nabla_\mathbf{x} P,
+\end{equation}
+%
+where the fluid volume fraction is denoted by $\phi^{\rm F}$ and the permeability tensor $\mathbf{K}$ determines the porous structure's ability to permit fluid flow within the solid matrix. This results in fluid pressure $P$ and effective solid stress $\boldsymbol{\sigma}^{\rm EFF}$ as follows:
+%
+\begin{equation}\label{eq-stress}
+    \boldsymbol{\sigma} :=  \boldsymbol{\sigma}^{\rm EFF} - P\mathbf{I}.
+\end{equation}
+%
+The constrained mixture theory~[\cite{klisch1999}] is frequently adopted to account for the contributions of different phases to the effective stress in AC. According to this theory, non-fluid segments are bound to each other, leading them to exhibit similar deformation. This is expressed as:
+%
+\begin{equation}\label{eq-cartilage_solid}
+    \boldsymbol{\sigma}^{\rm EFF} :=  \boldsymbol{\sigma}^{\rm COL} + \boldsymbol{\sigma}^{\rm MAT} - \boldsymbol{\sigma}^{\rm GAG}.
+\end{equation}
+%
+Within this framework, the annotations ${\rm COL}$, ${\rm MAT}$, and ${\rm GAG}$ denote the stress contributions from the collagen network, the non-fibrillar solid matrix, and the osmotic pressure, respectively~[\cite{mow1980,wilson2005,sajjadinia2019}].
+
+Regarding the osmotic pressure, it can be approximated by the electrostatic forces of glycosaminoglycans. This force is also strictly associated with solid matrix deformation [\cite{ateshian2004}]. Making this assumption simplifies the expression to an exponential form with material constants \(\alpha_1\) and \(\alpha_2\) [\cite{ateshian2004,buschmann1995,stender2013}]:
+%
+\begin{equation}\label{eq-osmotic}
+    \boldsymbol{\sigma}^{\text{GAG}} = \alpha_1 J^{-\alpha_2} \mathbf{I}.
+\end{equation}
+%
+As to the collagen fibrils, a nonlinear relationship between loads and strains is evident through experimentation [\cite{charlebois2004}]. Focusing on a specific fibrillar bundle $I$, this relationship can be represented as $(E_1 + E_2 \epsilon^I) \epsilon^I$, with $E_1$ and $E_2$ highlighting the nonlinearity extent. Then,
+%
+\begin{equation}
+    \epsilon^I = \log (\lambda^I).
+\end{equation}
+%
+Here, the fibrillar stretch is represented by $\lambda^I$, which is related to the total deformation by
+%
+\begin{equation}\label{eq:phi}
+    \lambda^I = \sqrt{\mathbf{n}^I \cdot \mathbf{B} \cdot\mathbf{n}^I},
+\end{equation}
+where, $\mathbf{n}^I$ is the new direction of the fibril bundle $I$ after deformation, which is correlated with the initial direction vector $\mathbf{N}^I$ via 
+%
+\begin{equation}\label{eq:n}
+\mathbf{n}^I = \frac{\mathbf{F} \cdot \mathbf{N}^I}{\left \| \mathbf{F} \cdot\mathbf{N}^I \right \|_{2}},
+\end{equation}
+%
+where $\left \| \bullet \right \|_{2}$ denotes the $l^2$ norm of $\bullet$.  Furthermore, to account for surface area variations, the aforementioned constitutive equation of fibril $I$ can be multiplied with $\lambda^I/J$, the inverse of the surface area of the fibril bundle, yielding
+%
+\begin{equation}
+    \sigma^I = \phi^{\rm S}_0 \rho_{\rm C}^I \frac{\lambda^I}{J}(E_1 + E_2 \epsilon^I) \epsilon^I \quad \text{if } \epsilon^I > 0,
+\end{equation}
+%
+where, $\rho_{\rm C}^I$ represents the volume fraction of pertinent fibrils and $\phi^{\rm S}_0$ indicates the solid's initial volume fraction. The volume fractions are inserted in the equation to encompass the contribution of each phase based on mixture theory. Considering the compressibility of the porous solid structure of cartilage, these values are updated by the continuity equation, as follows
+%
+\begin{equation}
+    \label{continuity}
+    \varphi = \frac{\varphi_0}{J} 
+    \qquad 
+    \varphi \in \left \{\phi^{\rm S}, \: \rho^{\rm COL} \right \}.
+\end{equation}
+%
+Now, the total stress in the collagen fibrils at all directions, expressed as $\boldsymbol{\sigma}^{\rm COL}$ can be determined by \cite{wilson2004a}:
+%
+\begin{equation}\label{eq-fibril_stress}
+    \boldsymbol{\sigma}^{\rm COL} = \sum_{I=1}^9 \sigma^I \mathbf{n}^I \otimes \mathbf{n}^I,
+\end{equation}
+%
+where $\otimes$ represents the dyadic product.
+
+Finally, the other parts of the solid material can be modeled by nonlinear isotropic elastic models. One such common model is the neo-Hookean equation, grounded in rubber-like material thermodynamics [\cite{kim2012}]. This equation is adjusted to reflect the volume fractions of the material components [\cite{wilson2007,sajjadinia2019}]:
+%
+\begin{equation}\label{eq-non_fibrillar}
+    \boldsymbol{\sigma}^{\rm MAT} = 
+    \phi^{\rm S}_0 G_m \frac{1 - \rho_0^{\rm COL}}{J} \left[\frac{\ln{J}}{2} 
+    \left( \frac{1}{3} + \frac{J + \phi^{\rm S}_0}{J - \phi^{\rm S}_0} - \frac{\phi^{\rm S}_0 J\ln{J}}{( J - \phi^{\rm S}_0)^2} \right) \mathbf{I} 
+    + (\mathbf{B} - J^{2/3}\mathbf{I}) \right].
+\end{equation}
+%
+Here, \( G_m \) is a material constant. Hence, the stress in the components of this \ac{hf} multi-physics model correlates with the deformation in the tissue.
+
+The multiphasic model can be further simplified either by ignoring the contributions of some of its components or by using an alternative monophasic (elastic) model. An additional possible assumption in monophasic models is to incorporate a level of viscosity to model the time-dependent response (without including the fluid phase that makes biphasic models time-dependent). To exemplify a viscoelastic model, we first denote the deviatoric (DEV) and hydrostatic parts of a symmetrical second-order tensor \textbf{A} with superscripts \textit{D} and \textit{H}, respectively. Accordingly, we have [\cite{backus1970}]
+%
+\begin{equation}
+    \text{DEV} (\textbf{A}) = \textbf{A} - \textbf{A}^{H}, \quad \text{where } \textbf{A}^{H} = \frac{1}{3}\text{tr}(\textbf{A})\mathbf{I}.
+\end{equation}
+%
+Defining the Kirchhoff stress $\boldsymbol{\tau}=J\boldsymbol{\sigma}$, its instantaneous value (without viscosity) is denoted by the subscript 0. Then, a simplified viscoelastic model is formulated as:
+%
+\begin{align}
+    \boldsymbol{\tau} &= \boldsymbol{\tau}_{0} - \text{DEV}\left[ \frac{\mathcal{G}}{\mathcal{T}} \int_{0}^{t} \mathbf{\bar{F}}_{t}^{-1}(t-s) \cdot \text{DEV}(\boldsymbol{\tau}_{0}(t-s)) \cdot \mathbf{\bar{F}}_{t}^{-T}(t-s) e^{-s/\mathcal{T}} \, ds\right] \\
+    &-  \frac{\mathcal{K}}{\mathcal{T}} \int_{0}^{t} \boldsymbol{\tau}_{0}^{H}(t-s) e^{-s/\mathcal{T}} \, ds.
+\end{align}
+%
+Here, $\mathbf{\bar{F}}_{t}^{-1}(t-s)=\mathbf{\bar{F}}(t)\cdot\mathbf{\bar{F}}^{-1}(t-s)$ and its transposed are used as a transformation operator to shift the stress tensor to the current configuration (as it can be rotated for the deviatoric part), where $\mathbf{\bar{F}} = J^{-1/3}\mathbf{F}$ is the distortion gradient (disregarding the volume change since $\det \mathbf{\bar{F}}=1$). Also, $\mathcal{G}$ and $\mathcal{K}$ are material constants controlling the time-dependent shear and bulk moduli, respectively, while $\mathcal{T}$ is another constitutive constant controlling the tissue relaxation time until equilibrium is reached [\cite{fazekas2018,abaqus,simo1987}].
+
+
+
+\subsection{Implicit Finite Element Analysis}
+%
+The algorithms behind \ac{fe} analysis typically make use of the weak formulation of differential equations. For this reason, the virtual work principle [\cite{antman1979}] can be applied to the eq.~(\ref{eq-strong}), yielding to
+%
+\begin{equation}\label{eq-weak-alt}
+    \int_V \boldsymbol{\sigma}_{\mathrm{T}} \nabla_\mathbf{x} \cdot \delta \mathbf{u} \, \mathrm{d}V = 0,
+\end{equation}
+%
+with $\delta \mathbf{u}$ signifying the virtual displacement vector contributing to the virtual work. This way, the strong form, eq.~\ref{eq-strong}, is transformed into a simpler equation with scalar output due to the existence of the integrals and dot product. Next, by applying integration by parts, the divergence theorem, and leveraging eq.~\ref{eq-traction}, boundary, and volumetric parts are distinguished, as follows [\cite{gerhard-book,belytschko2014}]:
+%
+\begin{equation}
+    \int_V \delta \mathbf{u} \nabla_\mathbf{x} \boldsymbol{\sigma}_{\mathrm{T}} \, \mathrm{d}V - \int_S \mathbf{T} \delta \mathbf{u} \, \mathrm{d}S = 0.
+\label{eq-alt-dode}
+\end{equation}
+%
+In case the fluid phase is also modeled, we first discretize the time derivatives using finite differences, particularly through the backward Euler approach. For instance, applying this to a function $y$, in this case the first term of eq.~\ref{eq-pde}, results in
+%
+\begin{equation}
+    \frac{\mathrm{d}y}{\mathrm{d}t} \bigg|_{t+\Delta t} \approx \frac{y_{t+\Delta t} - y_t}{\Delta t}.
+\end{equation}
+%
+After finding the derivative and then finding the weak form with a method similar to the weak form derivation of the equilibrium equation, a weak formulation for this equation is also obtained using
+%
+\begin{eqnarray}
+    & & \int_V \left( \left[ \delta P \right]_{t+\Delta t} \left( \left[ J \rho \phi^{\rm F} \right]_{t+\Delta t} - \left[ J \rho \phi^{\rm F} \right]_{t} \right) - \Delta t \left[ \rho \phi^{\rm F} \nabla_{\mathbf{x}} \delta P \cdot \mathbf{v}_{\rm r} \right]_{t+\Delta t} \right) \, \mathrm{d}V \nonumber \\
+    & & + \Delta t \int_S \left[ \delta P \rho \phi^{\rm F} \mathbf{n} \cdot \mathbf{v}_{\rm r} \right]_{t+\Delta t} \, \mathrm{d}S = 0,\label{eq-fluid}
+\end{eqnarray}
+%
+where $\delta P$ indicates the virtual fluid pressure. Combining this with eq.~\ref{eq-darcy} gives
+%
+\begin{eqnarray}
+    & & \int_V \left( \left[ \delta P \right]_{t+\Delta t} \left( \left[ J \rho \phi^{\rm F} \right]_{t+\Delta t} - \left[ J \rho \phi^{\rm F} \right]_{t} \right) - \Delta t \left[ \rho \phi^{\rm F} \nabla_{\mathbf{x}} \delta P \cdot \mathbf{v}_{\rm r} \right]_{t+\Delta t} \right) \, \mathrm{d}V \nonumber \\
+    & & - \Delta t \int_S \left[ \delta P \frac{\rho}{\mu } \mathbf{n} \cdot \mathbf{K} \cdot \nabla_\mathbf{x} P \right]_{t+\Delta t} \, \mathrm{d}S = 0,\label{eq-fluid-2}
+\end{eqnarray}
+%
+This equation, together with eq.~\ref{eq-alt-dode} with one of the solid constitutive equations applied, defines the possible weak formulation in which the integrals can be calculated numerically after discretizing the physics domain into smaller elements, called \ac{fe}s.
+
+For clarification of the spatial discretization in \ac{fe} analysis, a nonlinear 1D function, \( f(x) \), is exemplified by its approximation after discretization, \( \bar{f}(x) \):
+%
+\begin{equation}\label{eq-alt-shape}
+    \bar{f}(x) = \sum_{i=1}^{n} \mathcal{N}^{i}(x) f(x_i),
+\end{equation}
+%
+where the spatial space is divided into 1D \ac{fe}s with nodal inputs \( x_i \) associated with outcomes \( f(x_i) \) over the domain \( [x_{i-1}, x_i] \) of element $i$. The defined shape functions, \( \mathcal{N}(x) \), are then expressed as
+%
+\begin{equation}
+    \mathcal{N}_1^{i}(x) = \frac{x - x_{i-1}}{x_i - x_{i-1}} 
+    \quad \text{and} \quad 
+    \mathcal{N}_2^{i}(x) = \frac{x_i - x}{x_i - x_{i-1}}.
+\end{equation}
+%
+These shape or interpolation functions represent \( f(x) \) as a sequence of interconnected simpler functions at the nodal points. In practice, the interpolation can be of higher order and dimensions, allowing more accurate numerical integrations, as illustrated in Fig.~\ref{fea}.
+%
+\begin{figure}
+\includegraphics[width=1\linewidth]{fea.png}
+\caption{Examples of \acp{fe} and mesh entities: typically, the geometric domain is discretized into \acp{fe}, and the boundary conditions are applied to the nodes. In this manner, integrals are computed at integration points and are then usually extrapolated to the nodes. The choice of element definition depends on dimensionality and physical characteristics, such as geometric complexity.}
+\label{fea}
+\end{figure}
+
+Extending the concept of 1D \acp{fe} to 3D space of this multi-physics equation, shape functions, \( \mathcal{N}^P \) and \( \mathcal{N}^\mathbf{u} \), are introduced similarly for spatial discretization of \( P \) and \( \mathbf{u} \) (along with their virtual variations). Inserting them into eqs.~\ref{eq-fluid-2} and \ref{eq-alt-dode}, we get
+
+%
+\begin{equation}
+    \mathcal{F} =
+    \begin{bmatrix}
+        \left[\int_V \mathcal{N}^\textbf{u} \nabla_\textbf{x} \boldsymbol{\sigma} \, {\mathrm d}V - \int_S \textbf{T} \mathcal{N}^\textbf{u} \, {\mathrm d}S\right]_{t+\Delta t} \\
+        \begin{aligned}
+            &\int_V \left ( \mathcal{N}^p_{t+\Delta t} \left( \left[ J \rho \phi^F \right]_{t+\Delta t} - \left[ J \rho \phi^F \right]_{t} \right) - \Delta t \left[ \rho \phi^F \nabla_{\mathbf{x}} \mathcal{N}^p \cdot \mathbf{v}_{\rm r} \right]_{t+\Delta t} \right) \, {\mathrm d}V \\
+            &\hookrightarrow + \Delta t \int_S \left[ \mathcal{N}^p \frac{\rho}{\mu } \mathbf{n} \cdot \mathbf{K} \cdot \nabla_\mathbf{x} \mathcal{N}^p \bar{P} \right]_{t+\Delta t} \, {\mathrm d}S
+        \end{aligned}
+    \end{bmatrix}
+    = \textbf{0}.
+    \label{eq:alt-deq-matrix}
+\end{equation}
+%
+Since both of the shape functions are geometrical functions, their gradients can be determined. Therefore, the governing equations are fully discretized, and all derivatives are eliminated. The final form of this equation depends on the exact formulation of the shape functions, the selected constitutive equations, the numerical integration method, and the dimensionality of the problem. Depending on the fidelity, the final form can be different, for instance, when viscosity is used instead of the fluid pressure, or when contact equations are also added [\cite{pore2021,orava2022,orozco2022,oleg2023}]. Therefore, eq.~\ref{eq:alt-deq-matrix} is merely an illustrative example, and as we used \cite{abaqus} here, interested readers might refer to its documentation for more specific equations.
+
+This approach is termed implicit \ac{fe} analysis, as it yields equations connecting unknown parameters at $t + \Delta t$ with known values at time $t$ after discretization. By the way, it remains a set of nonlinear equations that first need to be linearized and then solved, for example, by Newton's method [\cite{almeida1997,belytschko2014}]. In this regard, the system's variables, in this case, $\left\{ u_1, u_2, u_3, P \right\}$, are denoted by $\mathfrak{U}$. In the 3D Cartesian system, $u_1, u_2$, and $u_3$ are the $\mathbf{u}$ components. To apply Newton's method for linearizing eq.~\ref{eq:alt-deq-matrix}, represented by $\mathcal{F}$, the Jacobian matrix $\mathfrak{J}^{(i)}$ is used during each iteration step $i$. This matrix is formulated as
+%
+\begin{equation}
+    \label{eq:j}
+    \mathfrak{J}^{(i)} := \begin{bmatrix}
+        \frac{\partial \mathcal{F}^{(i)}_1}{\partial u^{(i)}_1} & \cdots & \frac{\partial \mathcal{F}^{(i)}_1}{\partial P^{(i)}}\\
+        \frac{\partial \mathcal{F}^{(i)}_2}{\partial u^{(i)}_1} & \cdots & \frac{\partial \mathcal{F}^{(i)}_2}{\partial P^{(i)}}
+    \end{bmatrix},
+\end{equation}
+%
+with
+%
+\begin{equation}
+    \mathcal{F}^{(i)} := \mathcal{F}\Big|_{\substack{\mathfrak{U}^t=\mathfrak{U}^{(i-1)}, \: \mathfrak{U}^{t+\Delta t}=\mathfrak{U}^{(i)}}}.
+\end{equation}
+%
+Let $\mathfrak{U}^{(0)}$ be the known value of $\mathfrak{U}$ determined at the start of the increment, using $\mathfrak{U}^{(1)}$ as the initial guess, the nonlinear equations are linearized sequentially as:
+%
+\begin{equation}\label{eq-fea_opt}
+    \mathcal{F}^{(i+1)} := \mathcal{F}^{(i)} + \left ( \mathfrak{U}^{(i+1)} - \mathfrak{U}^{(i)} \right ) \cdot \mathfrak{J}^{(i)}.
+\end{equation}
+%
+These linear equations can then be solved using any standard linear algebra techniques to determine $\mathfrak{U}^{(i+1)}$. Convergence is confirmed when $\mathcal{F}^{(i+1)}$ approaches zero, indicating that the unknowns are well-approximated [\cite{belytschko2014}].
+
+A user of Abaqus can define numerical problems, such as boundary conditions, geometry, constitutive behavior, element formulation, and more. The software automatically implements eq.~\ref{eq-fea_opt} for the specified problem automatically, and its integration with Python scripts, simplifies numerical implementation. However, implementing a multiphasic model is an exception. Although Abaqus can approximate biphasic behavior using the soil consolidation theory [\cite{verruijt1984}], Fortran subroutines are necessary for implementing multiphasic equations. In these subroutines, eq.~\ref{eq-cartilage_solid} is directly coded along with its contribution to the Jacobian matrix (eq.~\ref{eq:j}). This can be approximated using a generic finite difference algorithm [\cite{miehe1996}]. Interested readers might refer to previous tutorials [\cite{nolan2022,fehervary2020}] for more details.
+
+\section{Data-Driven Modeling}
+\subsection{Deep Learning}
+
+In supervised machine learning, the central task involves designing a model function $f$, mapping each element in a set of input data $\mathcal{X}$ to a corresponding element in an output set $\mathcal{Y}$. This relationship is mathematically expressed as $f: \mathcal{X} \longrightarrow \mathcal{Y}.$ The elements in $\mathcal{Y}$, also known as labels, are derived from either human or automated supervision, and are used to develop and assess the model. These labels, in conjunction with input data, are characterized by multidimensional features. For instance, if the values of boundary conditions in a simulation can be seen as the input features, the labels would be the observed or calculated deformation in the tissue.
+
+Deep learning algorithms, like many of the other supervised machine learning methods, seek the most effective function $f$ using a group of labeled data $\mathcal{Z}\subset \mathcal{X} \times \mathcal{Y}$ and applying an optimization algorithm. This is achieved through minimizing errors, quantified by a loss function $\mathcal{L}: \mathcal{M} \left ( \mathcal{X},\mathcal{Y} \right ) \times \mathcal{Z} \longrightarrow \mathbb{R},$ where $\mathcal{M}$ denotes the set of all potential learnable functions, which can have various hypothetical definitions like different artificial neural networks [\cite{abiodun2019}].
+
+A simple network is the multi-layer \ac{ffnn}, which links a sequence of input features through dense (fully connected) layers to subsequent layers until the final output layer is reached [\cite{rumelhart1986}]. For an FFNN model $\Psi \in \mathcal{M}\left ( \mathcal{X},\mathcal{Y} \right )$ with $L$ layers, the function can be expressed as:
+%
+\begin{equation}\label{eq-ffnn}
+\Psi (x; \cdot, \Theta )= \psi^{(L)} \left( \psi^{(L-1)} \left(\cdots \left(\psi^{(1)} \left( \psi^{(0)} \left(x \right ) \right ) \right )\right )\right ).
+\end{equation}
+%
+In this model, $\psi^{(i)}$ represents the transformation through layer $i$, with $0$ being the input layer, and $\Theta$ includes the set of trainable parameters to be determined by the optimization algorithm. The simplest form of $\psi^{(i)}$ for regression problems is:
+%
+\begin{equation}\label{eq-layer}
+    \psi^{(i)}(x) = \begin{cases}
+        W^{(L)}\psi^{(L-1)}(x) + b^{(L)}, & \text{if } i = L, \\ 
+        a \left( W^{(i)}\psi^{(i-1)}(x) + b^{(i)} \right), & \text{otherwise},
+    \end{cases}
+\end{equation}
+%
+where $W$ and $b$ are the vectors of weight and bias parameters, and $a(\cdot)$ is the activation function, which introduces nonlinearity to capture complex nonlinear patterns [\cite{berner2022}]. Accordingly, a neuron, which is the most basic computational unit, is each member of $\psi^{(i)}$.
+
+A common activation function, used in eq.~\ref{eq-layer}, is the rectified linear unit (ReLU) [\cite{fukushima1980,nair2010}], defined as:
+%
+\begin{equation}
+\text{ReLU}(x) = \max(0, x).
+\end{equation}
+%
+This piecewise linear function only outputs the positive input signal that mimics the threshold-based firing in biological neurons. Due to the simplicity of this function, it has many optimized implementations, and therefore it is highly used.  However, it can encounter the "dying ReLU" issue during optimization, where the neurons might become too inactive. A frequently used alternative is the exponential linear unit (ELU) which defines a small exponential function for the negative signal, as follows :
+%
+\begin{equation}
+ \text{ELU}(x;\lambda^{\text{ELU}}) = 
+\begin{cases} 
+x & \text{if } x > 0, \\
+\lambda^{\text{ELU}} (e^x - 1) & \text{if } x \leq 0,
+\end{cases}
+\end{equation}
+%
+$\lambda^{\text{ELU}}$ is a hyperparameter, meaning it is a parameter that cannot be learned and must be specified by the user to define the network architecture. During the training process, an initial guess is made for the learnable parameters ($\Theta$), which are then iteratively adjusted by the optimizer based on the parameter gradient. While it is possible to adjust hyperparameters using another optimizer, this approach, known as hyperparameter search or tuning, can be overly time-consuming. Therefore, especially in the context of this study, hyperparameters are usually set by the user through trial and error, especially by considering commonly applied settings.
+
+The input during training consists of batches of concatenated samples. A large batch size can accelerate training by processing larger chunks of data, while a smaller batch size introduces noise into the training process. This noise can help the optimizer escape suboptimal local minima. Additionally, deep neural networks often encounter the issue of vanishing or exploding gradients, stemming from inconsistent scaling of network signal values. A common modification to eq.~\ref{eq-ffnn} involves using normalization layers either after or before each hidden layer, typically applied on either the batch or feature dimension. Although the input layer is usually normalized for the same reason, the output layer is sometimes normalized as well, especially if the features are of different scales. This approach enables more stable training and convergence [\cite{ioffe2015, bjorck2018, jingjing2019, gao2020, singh2022}].
+
+In addition to normalization, the method used for parameter initialization also determines the speed of convergence. These methods sample parameters for each layer in proportion to the number of input or output signals so that each layer with a higher number of signals has a smaller variance range. Thus, during training initialization, the network may maintain a consistent layer-wise variance of activations and gradients across layers. The Xavier initialization technique [\cite{glorot2010}] considers both input and output signals, whereas the He initialization [\cite{he2015}] assumes the number of output signals to be the same as the inputs, which might be more appropriate with certain activation functions [\cite{mlbook}].
+
+Alternatively, the LeCun initialization [\cite{lecun2012}] only considers the input signals, which may be more suitable for the scaled ELU (SELU) activation function [\cite{klambauer2017, mlbook}]. This function is a scaled version of the ELU function that empirically ensures self-normalization, thus potentially obviating the need for normalization layers. It is defined as follows:
+%
+\begin{equation}
+ \text{SELU}(x) \approx 1.0507 \begin{cases} 
+x & \text{if } x > 0, \\
+1.6733 ( e^x - 1) & \text{if } x \leq 0 
+\end{cases}
+\end{equation}
+
+Regardless of the selected training settings and network architecture, once the parameters are initialized, optimizers adjust them by:
+%
+\begin{equation}\label{eq-optimization}
+\theta_{t+1} = \theta_t - \alpha U_t,
+\end{equation}
+%
+where \(\alpha\) is the learning rate hyperparameter and \(U_t\) is the update function. In the context of deep learning, where high-order optimizers could be ill-conditioned due to the noise in each mini-batch of labeled data, Adam, a popular and efficient first-order optimizer, is used. This optimizer is an extension and combination of previous first-order optimization methods [\cite{kiefer1952, polyak1964, nesterov1983, duchi2011, hinton2012}], defined by:
+%
+\begin{equation}\label{eq-update}
+U_t = \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon},
+\end{equation}
+%
+with \(\epsilon\) being a small constant to prevent zero-division. Also, \(\hat{m}_t\) and \(\hat{v}_t\) are respectively the modified first and second moments, defined by:
+%
+\begin{equation}\label{eq-momont1}
+\hat{m}_t = \frac{m_t}{1-\beta_1^t},
+\end{equation}
+%
+\begin{equation}\label{eq-momont2}
+\hat{v}_t = \frac{v_t}{1-\beta_2^t},
+\end{equation}
+%
+where \(\beta_1\) and \(\beta_2\) are typically hyperparameters close to one. \(m\) and \(v\) are respectively the mean and variance estimates, updated by:
+%
+\begin{equation}\label{eq-momont1update}
+{m}_t = \beta_1{m}_{t-1} + (1-\beta_1)\nabla_{\Theta} \mathcal{L}(\Theta_t)
+\end{equation}
+%
+\begin{equation}\label{eq-momont2update}
+{v}_t = \beta_2 {v}_{t-1} + (1-\beta_2)\left(\nabla_{\Theta} \mathcal{L}(\Theta_t)\right)^2.
+\end{equation}
+%
+Conceptually, since these metrics are initially zeroed, they are biased toward small values in the early iterations, and therefore their values are augmented by eqs.~\ref{eq-momont1} \& \ref{eq-momont2}. The hyperparameters in eqs.~\ref{eq-momont1update} \& \ref{eq-momont2update} help in smoothing out the updates to dampen oscillations. These accumulations of gradient and its standard deviation are then applied into eq.~\ref{eq-update} so that it adaptively scales down the gradients with huge variances to avoid overshooting the global minimum.
+
+To implement eq.~\ref{eq-optimization}, a loss function should be selected to measure prediction error. Since our deep learning problems here are regression tasks, where even the outliers (like irregular numerical noises) are significant, we used the \(l_2\) loss, known as the \ac{mse}, which is basically the Euclidean distance between the prediction vector and target vector. This differentiable function can now be differentiated, and then, using the chain rule of calculus, it can be related to the gradient of each parameter, i.e., \(\nabla_{\Theta} \mathcal{L}(\Theta_t)\). This process is known as the backpropagation algorithm [\cite{rumelhart1986}], where the gradient is calculated in a backward manner, from the output to the input layers, typically using an automatic differentiation algorithm; see the [\cite{baydin2018}] study for further details.
+
+One of the key aspects of training involves the training loop, where a batch of input data is fed into the model, and the parameters are updated based on the loss function and optimization algorithm. This loop repeats until all data in the training set has been processed, marking the completion of an epoch. Metrics such as MSE are used to assess model performance on different data splits (training, validation, and testing sets), which helps in evaluating the model's generalizability to unseen data. The distinction between in-distribution and out-of-distribution testing errors is made based on the similarity of the testing set to the training set. Additionally, to prevent overfitting, an early stopping mechanism is often employed where the training process is halted if the validation error starts increasing. This ensures that the model retains its generalization ability and does not become overly complex for the given data [\cite{mlbook}].
+
+In practical terms, deep learning models especially for regression tasks, such as those described in this study, are typically implemented using high-level libraries like Keras [\cite{chollet2015}] or Sonnet [\cite{reynolds2017}], together with TensorFlow [\cite{abadi2015}] and other python tools [\cite{hunter2007,pedregosa2011,kluyver2016,harris2020,virtanen2020}]. These libraries provide a rich set of tools, including built-in network elements, data handling utilities, and automatic implementation of training optimizers and backpropagation. This simplifies the process of setting up and training a model, as most of the complex underlying mechanisms are abstractly handled by the libraries. The user's primary task is to define the network architecture, after which these tools take care of the iterative training process. Also, although these tools offer utilities to help manage overfitting, we chose simplified models for faster training in this study and did not use them. Our main challenge is indeed to prevent underfitting, which can lead to suboptimal performance.
+
+On the other hand, deep learning can also be applied in an unsupervised, or more precisely, self-supervised manner, where the input and output data are the same. These so-called autoencoders are designed to learn typically reduced representations (encodings), which are then reconstructed by a decoder and implemented using regular \ac{ffnn}. The primary use case is for dimensionality reduction. However, a notable variation is the denoising autoencoder (DAE), which involves adding artificial noise to the data in a preprocessing step (often referred to as data augmentation since it generates new samples). The DAE then learns to remove this noise [\cite{hinton2006,vincent2008}].
+
+Another deep learning model used in this study is the message-passing \acp{gnn}, which allow for permutation invariance, meaning that the input data can be fed in different orders. In such \acp{gnn}, the focus is on local behavior, particularly on a graph node and its neighbors. This updates the nodal representations as follows:
+%
+\begin{equation}
+\label{eq:gnn}
+\mathfrak{v}'_n = \text{FFNN} \left(\sum_{i \in \Gamma(n)}\mathfrak{v}_i, \mathfrak{v}_n\right),
+\end{equation}
+%
+where $\mathfrak{v}'_n$ is the updated nodal feature. The effectiveness of the model can be further enhanced by incorporating edge features and updating them with another \ac{ffnn} [\cite{cai2018,zhou2020,wu2021}]. The main application here is in scenarios where geometrical generalizability is critical. This is achieved by first learning local behavior and then generalizing to other geometries.
+
+In summary, the selection of a DL method depends largely on the objectives at hand, with a focus on employing such learnable AI systems instead of relying on predefined physical models. This approach, particularly in the current era dominated by Python and its extensive libraries, becomes increasingly feasible given the availability of sufficient data and computational resources.
+
+\subsection{Surrogate Modeling}
+%
+Surrogate methodologies offer a synergy of data-driven strategies and computational analytics, providing efficient simulators widely applied in diverse fields such as healthcare [\cite{holzapfel2021,shim2020,liang2018b}] and engineering [\cite{pfaff2021,gao2020b,kalyuzhnyuk2019}]. These methods, particularly deep learning or alternative regression techniques, are adept at identifying patterns within FE model samples. As both physics-based and AI methods are relatively easy to implement, surrogate models are also straightforward to apply, especially for simple models.
+
+As an illustrative example (Fig.~\ref{basic_surrogate}), a basic FE model is formulated in Abaqus to examine contact mechanics in a 2D rectangular tissue with an embedded circular hole to complicate mesh organization. This model employs a straightforward monophasic framework (i.e., an incompressible neo-Hookean formulation). Simulation results are obtained for each mesh point, from the vertical Cauchy stress. An FFNN is then employed to learn the physics on a regular computer. This surrogate model mirrors those found in standard cartilage research but further simplifications for clarity [\cite{paiva2012,arbabi2016a,arbabi2016b}]. To expedite the learning process, the model's complexity is reduced by incorporating a single hidden layer that contains a mere fraction of the neurons compared to the final layer. This approach parallels the concept of reduced-order models for fast training [\cite{pant2021}], albeit utilizing an FFNN.
+%
+\begin{figure}
+\includegraphics[width=1\linewidth]{pmse.jpg}
+\caption{Example of a surrogate model and its evaluation. Training performance is depicted using global metrics, with emphasis on the widely recognized MSE metric. The \( \textrm{SE}_m \) box plot, highlights sample anomalies as well. The PMSE contours are superimposed on the initial configuration. Observing the final snapshots indicates the inaccuracy in learning where the element shapes varied. PMSE offers valuable insights for further interpretability, yet MSE remains a conventional standard for metric comparison.}
+\label{basic_surrogate}
+\end{figure}
+
+For the evaluation of the surrogates, global metrics, such as the MSE, are widely used [\cite{phellan2021}]. For a surrogate, for instance, we assume that it can predict the outputs of the numerical model extracted at \( N \) assigned points (such as FE nodes) evaluated on \( M \) test samples. Accordingly,
+%
+\begin{equation}\label{eq:msem}
+    \text{MSE} = \frac{1}{M}\sum_{m=1}^{M}\text{SE}_m
+    \quad \text{with} \quad
+    \text{SE}_m = \frac{1}{N}\sum_{n=1}^{N}
+    (\bar{y}_{m,n} - y_{m,n})^2.
+\end{equation}
+%
+Here, \( \bar{y}_{m,n} \) and \( y_{m,n} \) are the prediction and target values of the \( n^{\text{th}} \) point of sample \( m \), respectively, and \( \text{SE}_m \) is the averaged squared error corresponding to sample \( m \). Despite the benefits of these popular global or averaged metrics, they might be barely interpretable beyond performance comparison \cite{molnar2019}. Therefore, it is common practice to visualize the prediction for each sample [\cite{sanchez2020}]. However, this approach focuses only on each sample separately, which might bias our inference towards those selected samples. A better alternative is to use local metrics that enable pointwise visualization of the errors [\cite{giselle2019}], such as the \ac{pmse} on point \( n \), i.e.,
+%
+\begin{equation}\label{eq:pmse}
+    \text{PMSE}_n = \frac{1}{M}\sum_{m=1}^{M}
+    (\bar{y}_{m,n} - y_{m,n})^2.
+\end{equation}
+%
+This metric allows us to visualize a contour plot of errors on the physical system, helping us to see the direct correlation between the machine learning and numerical mesh, if relevant. For other performance comparisons, MSE is preferred.
+
+For very simplified models, as exemplified above, a surrogate may be generated efficiently. However, for complex multi-physics equations of cartilage, especially at a large scale, having a large training dataset for machine learning is not feasible. If the primary purpose of applying ML is to enhance efficiency, the models should ideally be trained on a limited number of samples, especially when the numerical generation of these samples is costly [\cite{forrester2008}]. This factor often leads to the underutilization of AI-enhanced modeling techniques. This research gap — the development of an advanced yet efficient \ac{fe} analysis and \ac{ml} synergy for cartilage surrogate modeling — will be addressed in the upcoming chapters. It involves advancements in both the numerical aspects and the machine learning components of the cartilage surrogate model.
+
+\chapter{Finite Element Analysis with Pre-Stressing Optimizers}
+
+This study focuses on surrogate modeling of the multi-physics cartilage \ac{fe} model, a critical aspect of which is using an accurate and efficient simulator to generate datasets. This chapter explores the complexities of FE simulation, highlighting a significant challenge: the pre-stress conditions in the solid matrix that are physiologically present. We implement, compare, and validate various pre-stressing algorithms proven effective in cartilage multi-physics modeling. These algorithms employ efficient optimization techniques to determine the initial, unknown in vivo conditions—those conditions without pre-stressing—crucial for a \ac{hf} cartilage simulator, which will be used in subsequent chapters. The algorithm is initially applied to 2D test cases and then expanded to a 3D simulation test.
+
+\section{Related Work}
+
+\paragraph{Pre-stressing effects.} As explained in Chapter 2, \ac{ac} is generally considered a fibril-reinforced mixture within a charged medium, potentially leading to osmotic pressure. This pressure often serves as the primary load-bearing component in AC, as demonstrated in both healthy [\cite{quiroga2017}] and damaged [\cite{sajjadinia2019}] models; therefore, it should not be overlooked in multi-physics analyses. The initial value of this pressure can be established by considering the initial condition (no deformation), i.e., $J = 1$, in eq.~\ref{eq-osmotic}, yielding $\boldsymbol{\sigma}^{\text{GAG}}_0 = \alpha_1 \mathbf{I}$. This \textit{in vivo} initial pressure induces stress in the otherwise stress-free state of the tissue; thus, it is termed the cartilage pre-stress $\boldsymbol{\sigma}_0$. This can be calculated by applying the initial conditions of a stress-free state (without any external load or deformation), i.e., $\textbf{F}_0=\textbf{I}$ and $P_0 = 0$, into eq.~\ref{eq-stress}, resulting in $\boldsymbol{\sigma}_0 = -\alpha_1 \mathbf{I}$.
+
+The FE code primarily implements pre-stressing by assuming a stress-free state as the initial condition. Introducing this swelling stress into the \ac{fe} mesh naturally causes it to expand, stretching the fibers until reaching equilibrium, i.e., the pre-stressed state. The biomechanical effect of this pre-stressing-induced swelling has been studied experimentally [\cite{narmoneva1999}] and mathematically [\cite{setton1996}], recording evidence of heterogeneous residual strain field in the pre-stressed tissue. Also, the numerical comparison of fibril-reinforced multi-physics models of cartilage with and without pre-stress reveals significantly different distributions of Cauchy stress in a 2D study [\cite{wang2018}]. Nonetheless, this comparison only includes the effects of the pre-stressing on a small-scale geometrical configuration and therefore in this chapter, it is also extended to a larger-scale 3D model.
+
+\paragraph{Pre-stressing implementation.} The inclusion of cartilage pre-stressing in common FE code is challenging, as the existing literature predominantly records \textit{in vivo} data with a presumption that the pre-stressed condition is the starting point. This is sharply different from most numerical models, where the stress-free state is assumed as the initial condition. This fundamental difference leads to significant inconsistencies between the starting points in numerical models and actual \textit{in vivo} conditions [\cite{wang2018}]. A simplistic solution is to begin the regular numerical analysis with the experimentally determined pre-stressed configuration. However, as stated above, this approach adversely impacts the fidelity of the biomechanical simulation.
+
+An alternative method involves trying various stress-free geometries and manually applying pre-stressing to determine which stress-free configuration most accurately aligns with the experimental configuration after pre-stressing deformation [\cite{sajjadinia2019,stender2016}]. This method, though, is highly inefficient for repetitive tasks such as surrogate modeling, where each case requires a new round of trial and error. Therefore, a \ac{psa} is essential for automatically incorporating pre-stressing in numerical modeling.
+
+The iterative pre-stressing or pre-straining algorithms have been applied across different scientific disciplines, e.g., in the inverse motion problem with finite hyper-elasticity [\cite{govindjee1996}] and the modeling of aortic root and simulation of the stent deployment [\cite{caimi2020,votta2017}]. A common \ac{psa} technique is based on the multiplicative decomposition of deformation gradients [\cite{gee2010,weisbecker2014,pierce2015,zahn2016}]. While effective, these methods often necessitate modifications to \ac{fe} elements or constitutive equations, which might have complex implementations in many FE software.
+
+Mathematical calculation of the pre-stressing is also possible with very specific assumptions on geometry and material properties [\cite{alastru2007,rachev2003,taber1996}]. These methods are too restrictive for complex cartilage problems. An additional approach involves \acp{fpbbs}, known for their efficiency in finding stress-free geometry. These algorithms treat numerical models as closed systems, relying solely on the input and output geometrical values of these systems, without needing to alter the underlying numerical equations [\cite{leach2019}].
+
+In a \ac{fpbbs}, a function, here pre-stressing transformation, is defined so that a state like the stress-free configuration is its fixed point (or objective). Then, starting from an initial estimate, this function is applied, for example, by a forward (regular) FE analysis. In each iteration, the function output becomes its next input, gradually moving closer to its fixed point, while its error is measured by the forward analyses. The term "backward displacement" refers to, for example, implementing a backward (auxiliary) FE analysis to apply a displacement field on the model to reverse the effect of the pre-stressing, and getting the configuration for the next step [\cite{leach2019}].
+
+A noteworthy \ac{psa} based on the \ac{fpbbs} was developed by \cite{wang2018} and implemented in a complex \ac{ac} model. Despite being a significant advancement, it was primarily focused on geometry and did not account for constitutive variations arising from kinematic changes in mixture models. This limitation is addressed by introducing a new \ac{fpbbs} that includes material optimization. This approach optimizes not only the stress-free states for geometric configurations but also the affected material parameters.
+
+\section{Methodology}
+In the following, the term $\rm{(REF)}$ in superscript denotes the experimentally verified values that the \ac{fe} model aims to reach once it is under pre-stress and attains a state of equilibrium. The subscript $0$ is used to denote the initial state in an analysis. Additionally, the superscript $(t)$ indicates the values at the $t^{th}$ step in the \ac{psa}, which estimates the stress-free state of the involved parameters.
+
+\subsection{Pre-Stressing Optimizers}
+
+In most FE implementations, a forward analysis initiates from a state where no stress is present. Introducing pre-stress in an \ac{ac} model leads to the deformation of its matrix, culminating in a new configuration. In this equilibrium state, the model's boundary conditions and solid matrix counteract the internal pressure. As the material parameters are subject to change with this new configuration, applying the initial \textit{in vivo} values at the beginning of the simulation can lead to inaccuracies in the starting conditions for subsequent simulations. These initial \textit{in vivo} constitutive parameters can be sourced from existing literature, as depicted in Fig.~\ref{arcade} and the equations below [\cite{wilson2007,rieppo2004,shapiro2001,lipshitz1975}]:
+%
+\begin{equation}
+\phi_0^{S \, \rm{(REF)}}=0.1+0.2z,
+\end{equation}
+%
+\begin{equation}
+\rho_0^{\text{COL} \, (\rm{REF})}  =1.4z^2-1.1z+0.59,
+\end{equation}
+%
+where $z$ represents the normalized depth. The \textit{in vivo} data utilized in this study are averages of experimental data, thus excluding outliers.
+
+Regarding the PSA [\cite{bols2013}], the initial \textit{in vivo} (pre-stressed) state and stress-free state are considered known and unknown variables, respectively. In the beginning, a forward analysis begins with the \textit{in vivo} state as the first approximate stress-free state. Subsequently, the stress-free state is adjusted using an update function $\textbf{U}$, and the forward analysis is repeated until the residual function $r$'s value converges to a negligible amount. This suggests that the initial pre-stressed state is closely aligned with the \textit{in vivo} observations. This technique is capable of optimizing either the geometrical configuration alone (as implemented by \cite{wang2018}), or both geometrical and material parameters, as demonstrated in this work (Fig.~\ref{fig:psa_chart}).
+%
+\begin{figure}
+\includegraphics[width=\textwidth]{img/psa_chart.png}
+%\vspace{2.5cm}
+\caption{The role of the PSA in various simulation states: initially, the problem is presumed to start in a stress-free state with unknown state variables, encompassing geometrical configuration, material parameters, or both. Following the application of pre-stress, these state variables are updated to their revised values, aligning with the initial conditions of standard \textit{in vivo} or \textit{in vitro} tests that typically begin in a pre-stressed state. To ascertain the stress-free state, a PSA is employed, iteratively refining the initial estimates of state variables to align with the initial \textit{in vivo} values. Once determined, the primary numerical analysis can proceed to simulate the experimental test.}
+\label{fig:psa_chart}
+\end{figure}
+
+Now, considering the initial values of the parameters influenced by pre-stressing in our numerical model, symbolized by $\mathbf{s}$, they encompass geometrical data $\mathbf{x}$ and constitutive data $\mathbf{m}$ (components include $\mathbf{n}$, $\emptyset^{\rm{S}}$, and $\rho^{\rm{COL}}$). Our \ac{psa} conducts the following sequence of analyses:
+%
+\begin{equation}\label{eq:optimizer}
+    \mathbf{s}_{0}^{(t)} \xrightarrow[]{\text{forward analysis}} \mathbf{x}_{0}^{(t+1)} \xrightarrow[]{\text{backward analysis}} \mathbf{m}_{0}^{(t+1)}.
+\end{equation}
+%
+The forward analysis aims to estimate the stress-free geometry, and the backward analysis determines the alterations in material properties at this state.
+
+\paragraph{Forward analysis.} When pre-stressing is applied to the model in its initial state $\mathbf{s}^{(t)}_0$, the pre-stressed configuration $\hat{\mathbf{x}}^{(t+1)}$ is derived through an FE analysis and the multiphasics constitutive model eqs.~\ref{eq-cartilage_solid} \& \ref{eq-stress}. The update function $\mathbf{u}$ is defined as
+%
+\begin{equation}
+    \mathbf{u}^{(t)} := \hat{\mathbf{x}}^{(t)}-\mathbf{x}^{\rm{(REF)}},
+\end{equation}
+%
+and the stress-free geometry is edited in the following manner:
+%
+\begin{equation}
+    \mathbf{x}_{0}^{(t+1)} := \left\{\begin{matrix}
+    \mathbf{x}_{0}^{(t)} - \zeta^{(t)} \mathbf{u}^{(t)}  & \ \ \rm{if} \ \mathit{r}^{(t)} \leq \mathit{r}^{(t-1)},\\ 
+    \mathbf{x}_{0}^{(t)} & \ \ \rm{if} \ \mathit{r}^{(t)} > \mathit{r}^{(t-1)},
+    \end{matrix}\right.
+\end{equation}
+%
+with $r$ and $\zeta$ being respectively the residual and scaling factor, each determined by the optimization algorithm.
+
+\paragraph{Backward analysis.} The PSA, now, confines all the \ac{ac} nodes with the (displacement-based) boundary condition $\mathbf{b}$, using
+%
+\begin{equation}
+    \mathbf{b}^{(t+1)} := \left\{\begin{matrix}
+     - \zeta^{(t)}\mathbf{u}^{(t)} & \ \ \rm{if} \ \mathit{r}^{(t)} \leq \mathit{r}^{(t-1)},\\ 
+    \mathbf{0} & \ \ \rm{if} \ \mathit{r}^{(t)} > \mathit{r}^{(t-1)}.
+    \end{matrix}\right.
+\end{equation}
+%
+This allows another (backward) FE analysis to compute the new constitutive state $\mathbf{m}_0^{(t+1)}$ using eqs.~\ref{eq:n} \& \ref{eq:phi}, starting with state $\mathbf{s}_0^{(t)}$:
+%
+\begin{equation}
+    \mathbf{n}_{0}^{(t+1)} := \frac{\check{\mathbf{F}}^{(t)}\mathbf{n}_0^{(t)}}{\left \|\check{\mathbf{F}}^{(t)}\mathbf{n}_0^{(t)} \right \|_2},
+\end{equation}
+%
+\begin{equation}
+    \varphi_{0}^{(t+1)} := \frac{\varphi_0^{(t)}}{\rm{det}\check{\mathbf{F}}^{(t)}} 
+    \qquad \text{with } \forall \varphi \in \left\{\emptyset^{\rm{S}},\ \rho^{\rm{COL}}\right\}.
+\end{equation}
+%
+In this context, $\check{\mathbf{F}}$ represents the deformation gradient in the inverse analysis, as determined by the computational solver.
+
+\paragraph{Optimization.} With the following initial values,
+%
+\begin{equation}
+\left\{
+\begin{aligned}
+    \mathbf{s}_{0}^{(0)} &:= \mathbf{s}^{\rm{(REF)}}, \\
+    \mathbf{u}^{(0)} &:= \mathbf{0}, \\
+    \zeta^{(0)} &:= 1, \\
+    r^{(0)} &:= \infty, \\
+    \mathbf{b}^{(0)} &:= \mathbf{0}, \\
+    \check{\mathbf{F}}^{(0)} &:= \mathbf{I},
+\end{aligned}
+\right.
+\end{equation}
+%
+the above-mentioned optimizer allows estimation of the new initial state $\mathbf{s}_{0}^{(t+1)}$, i.e., $\mathbf{x}_{0}^{(t+1)}$ and $\mathbf{m}_{0}^{(t+1)}$. This process necessitates the use of the following equations:
+%
+\begin{equation}\label{eq:r}
+    r^{(t)} := \left \| \mathbf{U}^{(t)} \right \|_2,
+\end{equation}
+%
+\begin{equation}
+    \zeta^{(t)} := \left\{\begin{matrix}
+    \zeta^{(t-1)}  & \ \ \rm{if} \ \mathit{r}^{(t)} \leq \mathit{r}^{(t-1)},\\ 
+    \displaystyle \frac{\zeta^{(t-1)}}{\eta} & \ \ \rm{if} \ \mathit{r}^{(t)} > \mathit{r}^{(t-1)},
+    \end{matrix}\right.
+\end{equation}
+%
+where $\mathbf{U}$ encompasses all components of $\mathbf{u}$ at every node, and $\eta=4$ acts as a hyperparameter for averting potential divergence (adjustable for better convergence). The optimization is assumed to be converged when the error derived from eq.~\ref{eq:r} diminishes significantly, signifying the approximation of the stress-free state $\mathbf{s}_0$ is achieved through our \ac{fpbbs}.
+
+This algorithm can be further modified by using a different residual function, such as the infinity norm, to enhance pointwise optimization. Additionally, rather than calculating volume fraction changes in backward analysis, an alternative optimizer could be employed to test various initial values, achieving a better approximation of pre-stressed values. The sequential application of constitutive and geometrical parameters may improve convergence. Despite variations in implementation, all methods adhere to the same concept of cartilage \ac{psa} with also the \ac{mo}.
+
+\subsection{Simulation Tests}\label{section:simulation_fe}
+
+\paragraph{Numerical Implementation.} The \ac{fe} implementation of the \ac{ac} pre-stressing, as depicted in Fig.~\ref{fig:psa_subroutines}, involves forward analyses that incorporate stress-free material properties. This is achieved via a Fortran SDVINI subroutine, responsible for setting the initial state variable values at each integration point in the numerical model. This subroutine operates in alignment with Abaqus' step 0, which determines the geometric attributes (positions) of these points. Consequently, material parameters can be initialized with respect to the normalized depth $z$, and these computed variables are further processed through the Fortran UMAT subroutine for modeling the solid components of the tissue.
+
+\begin{figure}[t]\centering
+\includegraphics[width=0.5\textwidth]{img/psa_subroutines.png}
+\caption{Schematic representation of the pre-stressing implementation in cartilage models, using the Fortran subroutines of Abaqus.}
+\label{fig:psa_subroutines}
+\end{figure}
+
+The \ac{fpbbs}, as outlined in the preceding section, is implemented through a Python script. Initially, two FE models, mirroring each other and based on initial experimental data, are constructed for forward and inverse \ac{fe} analysis. Both models are assigned the same boundary conditions, with the inverse model incorporating also displacement nodal field $\mathbf{b}$ at each \ac{ac} node, starting at zero to represent an undeformed state.
+
+Following the backward analysis, the newly derived parameters are reintegrated into the SDVINI subroutine to initiate a fresh cycle of \ac{psa}. This iterative process persists until convergence is attained. However, substantial variations in the updating state variables during certain iterations may hinder the FE analysis or \ac{psa} convergence, which can be managed by moderating parameter updates, albeit increasing iteration counts. Figure~\ref{fig:psa_run} illustrates the PSA implementation in Abaqus, as employed in the following simulation experiments.
+
+\begin{figure}[t]\centering
+\includegraphics[width=\textwidth]{img/psa_run.png}
+\caption{Flowchart of the backward optimization of our PSA, executed in Abaqus using a Python script.}
+\label{fig:psa_run}
+\end{figure}
+
+\paragraph{2D tests.} Aligning with \cite{wang2018}'s earlier study on \ac{ac} pre-stressing, it is assumed that pre-stress alterations predominantly affect fibrillar component of cartilage matrix. Accordingly, tensile tests, both with and without material updates, are simulated using fully integrated 8-node biquadratic displacement and bilinear pore pressure elements. These simulations incorporate velocity boundary conditions to emulate a 1.2 stretch over 4000~Sec (refer to Fig~\ref{fig:fe_psa_2d}, right). For material calibration, a SciPy-based optimizer is employed to align FE models with varying fibrillar elasticity to empirical data [\cite{elliott2002}], using experimental stress and stretch records. The concept of experimental biomechanical parameters during pre-stressing is detailed in \cite{wang2018}'s research.
+%
+\begin{figure}\centering
+\includegraphics[width=0.7\textwidth]{img/fe_psa_2d.jpg}
+\caption{2D models with an axisymmetric geometry (left) and a plane strain geometry (right).}
+\label{fig:fe_psa_2d}
+\end{figure}
+
+In exploring the significance of including material parameters in pre-stressing updates, the PSA is conducted both with and without constitutive updates using an unconfined compression test. For them, fully integrated eight-node axisymmetric quadrilateral, biquadratic displacement, and bilinear pore pressure elements are selected, where the radial movement along the symmetry axis is restricted (refer to Fig~\ref{fig:fe_psa_2d}, left). Then, the alterations in material fractions along the symmetry axis and the changes in primary fibril orientations are calculated. In the following compression test, a cartilage plug of 0.5~mm radius underwent axial compression up to 10\% strain, guided by velocity boundary conditions on the upper nodes at 0.002~Sec\textsuperscript{-1}, finished by a relaxation phase.
+
+Moreover, in all 2D simulations, the modeled cartilage has a maximum of 1~mm depth and zero fluid pressure at its outer boundaries, allowing fluid to flow freely. The nodes on the \ac{ac}'s lower surface are fixed completely to mimic the osteochondral interface.
+
+\paragraph{3D test.} The knee model is derived from the Open Knee Project [\cite{erdemir2016}], based on MRI scans of a 70-year-old woman's cadaver. Here, the 2nd-order 3D brick elements with pore pressure equations are utilized for the cartilage models. Bones are modeled with rigid elements, and other knee components are modeled using eight-node \ac{3d} linear brick elements. Cartilage-bone and Ligament-bone interfaces are tightly bound, while bones are subjected to full constraint. The material models used for the other substructures are extracted from the \cite{shim2016} study.
+
+Additionally, for this joint-scale cartilage model, the normalized depth $z$ definition is redefined to accommodate the knee models with varying thicknesses. The position of each point is used to find the nearest nodal coordinates on the \ac{ac}'s upper and lower surfaces (signified by $d_t$ and $d_b$, respectively), with the aid of a nearest neighbor search algorithm [\cite{maneewongvatana1999}]. Then, 
+%
+\begin{equation}
+    z = \frac{ d_t }{ d_t+d_b }.
+\end{equation}
+%
+\begin{figure}\centering
+\includegraphics[width=\textwidth]{img/direction.jpg}
+\caption{Example of the orientations of split lines of an AC substructure (left) and a local plane corresponding to an AC point (right).}
+\label{fig:split_lines}
+\end{figure}
+%
+Now, considering the model's asymmetry, a local plane is constructed at each \ac{ac} point, assuming that the primary fibrils within this plane mark the split-lines patterns on the AC surface. These lines are generally assumed to be directed toward the center of each cartilage substructure [\cite{mononen2012}]. Therefore, the local plane encompasses one vector facing the central point and another linking the nearest surface points, as shown in Fig.~\ref{fig:split_lines} with blue arrows. With this plane and the calculated normalized depth, the fibrillar orientations are defined, in the same way as the ones used in 2D models, complementing the \ac{fe} implementation.
+
+\section{Results and Discussion}
+
+In this study, we introduce a novel \ac{psa} that integrates nodal geometric optimization and material optimization (MO) for \ac{fe} analysis. This approach is applied to an anisotropic, depth-dependent \ac{ac} mixture model, which comprises all major multiphasic components explained in the previous chapter. Our proposed solution addresses the inconsistency between actual \textit{in vivo} states and numerically-implemented pre-stressed states. This is achieved by incorporating constitutive variables into existing \acp{fpbbs} [\cite{wang2018,bols2013,pandolfi2008}] and by defining an inverse analysis for inclusion of these variables.
+
+The main hypothesis of this study is that the heterogeneous constitutive properties of the multiphasic \ac{ac} model can be modified through the application of  pre-stressing via a \ac{fpbbs} with material variations, and this modification can influence the biomechanics of the tissue. To evaluate this hypothesis, a series of 2D tests was conducted, followed by a larger-scale analysis involving a tibiofemoral joint to examine the effects of pre-stressing. The proposed algorithm proved its high efficiency, as it automatically identifies the stress-free state within a maximum of six hours using a regular hardware setup in the most resource-intensive model (used in the 3D test).
+
+\paragraph{2D tensile test.} The constitutive equations, previously validated [\cite{sajjadinia2019}], were not previously combined with pre-stressing methods. Therefore, we simulated a series of tensile tests, both with and without material variation across a broad spectrum of fibrillar elasticity parameters. The initial parameter values were based on earlier research [\cite{wilson2007}]. Table~\ref{table:calibraion} presents the derived values for both scenarios, and Fig.~\ref{fig:calibration} compares the simulation results with experimental data [\cite{elliott2002}].
+%
+\begin{table}\centering
+\caption{Fitted constitutive parameters of the fibrillar network for the different \acp{psa}.}
+\label{table:calibraion}
+\begin{tabular}{lcc}
+\hline
+\textbf{Parameter}  
+& \textbf{PSA with MO}
+& \textbf{PSA without MO}
+\\
+\hline
+$E_1$ (MPa) 
+& 19.51&    30.21 
+\\
+$E_2$ (MPa) & 230.67&    234.11 \\
+\hline
+\end{tabular}
+\end{table}
+%
+\begin{figure}\centering
+\includegraphics[width=0.5\textwidth]{img/calibration.jpg}
+%\vspace{2.5cm}
+\caption{Recorded stress vs. stretch extracted from calibrated numerical models mimicking an experimental test [\cite{elliott2002}]}
+\label{fig:calibration}
+\end{figure}
+
+Both calibrated FE models exhibited close alignment with median values: initially, the stress-strain curves show mild nonlinearity, reflecting the cartilage's near-linear behavior at the onset. However, these curves slightly underestimate stress compared to median experimental values. At a stretch value of approximately 1.06, the response became dominated by the nonlinear elasticity of fibrils, leading to a minor overestimation of stress. Nonetheless, both recorded responses fall within the range of experimental data, indicating their applicability in general \ac{ac} modeling.
+
+Regardless of the similarity in the results, the model without material alteration displayed slightly more strain-related fibrillar elasticity $E_2$ but significantly higher initial elasticity $E_1$. This observation could be attributed to the initial pre-stressing state where the fibrillar network predominantly resists osmotic pressure [\cite{quiroga2017}]. Also, since the model without MO has decreased material fractions, as per eq.~\ref{continuity}, there is a need to increase fibrillar elasticity, particularly the initial elasticity, to compensate for these reductions, especially at the small deformation.
+
+\paragraph{2D compression test.} In pursuit of validating our hypothesis, we conducted \ac{fe} simulations in a confined compression scenario. These simulations were executed with previously calibrated constitutive models, both with and without optimizing the material parameters via the \acp{psa}. Accordingly, Fig.~\ref{fig:fiber_orientation} displays the distribution of the angle $\uptheta$, signifying the deviation between the radial axis and one of the exemplified fibrillar directions upon achieving equilibrium. The model incorporating \ac{mo} exhibited precise alignment with \textit{in vivo} observations. In contrast, the model lacking \ac{mo} deviated in the peripheral regions, with angle variations between 5 and 10\% compared to the \textit{in vivo} measurements.
+%
+\begin{figure}\centering
+\includegraphics[width=0.7\textwidth]{img/fiber_orientation.jpg}
+%\vspace{2.5cm}
+\caption{Contour of a representative fibrillar angle $\uptheta$  with respect to the radial axis in pre-stressed initial states.}
+\label{fig:fiber_orientation}
+\end{figure}
+
+Figure~\ref{fig:fractions} displays the variations in the volume fractions of the constitutive equations along the normalized depth in the cartilage's axis of symmetry. While both models demonstrated analogous trends, the non-\ac{mo} model exhibited approximately 8 to 16\% divergence from the experimental values across most regions; however, the deeper zones showed convergence in both models. Discrepancies in such constitutive parameters support this study's hypothesis, considering that they indicate the influence of \ac{mo} on the biomechanics of cartilage. Supporting this, \cite{julkunen2008} noted that variations in volume fractions significantly impact mechanical responses while maintaining underlying trends. These findings indirectly validate the enhanced precision and significance of \ac{mo} incorporation in \ac{psa}. Further insights into the biomechanical effects are being explored through the following relaxation test simulations.
+%
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{img/fractions.jpg}
+\caption{Comparative plots of volume fractions with respect to the \ac{ac} normalized depth in the pre-stressed initial state compared with the experimental values [\cite{wilson2007,rieppo2004,shapiro2001,lipshitz1975}]. }
+\label{fig:fractions}
+\end{figure}
+
+The axial stress-strain relationships of the solid constituents in cartilage zones were presented in Fig.~\ref{fig:parts_stress_strain}. These zones include the \ac{sz}, \ac{mz}, and \ac{dz}. At the maximum loading point, the fibrillar component exhibited a stress response change, up to 44\% when mo was incorporated, increasing from 0.42 to 0.71MPa in the \ac{mz}. In the other zones, these changes were 9\% and 12\% in the \ac{sz} and \ac{dz}, respectively. Regarding the other solid components, the non-fibrillar part showed the highest stress variation, approximately 16\%. Thus, the application of \ac{mo} resulted in notably different stress calculations compared to traditional backward algorithms, highlighting \ac{mo}'s impact on the mechanics of the tissue and further supporting our hypothesis.
+%
+\begin{figure}\centering
+\includegraphics[width=\textwidth]{img/parts_stress_strain.jpg}
+%\vspace{2.5cm}
+\caption{Stress vs time plots from numerical simulations of unconfined compression experiments with (black curves) and without (red curves) \ac{mo} for different cartilage zones and effective solid parts after equilibrium.}
+\label{fig:parts_stress_strain}
+\end{figure}
+
+Moreover, the stresses recorded in the constituents in the compression experiment for both models showed similar patterns, consistent with previous findings: the osmotic pressure was a major contributor to load resistance, paralleling earlier research by \cite{quiroga2017}; the fibrillar components initially exhibited high stress values, then stabilized to negligible levels, akin to observations in the \cite{wilson2007} study; notably, the stress in the fibrillar network in \ac{dz} was significantly higher than the values in other zones, explained with the higher osmotic pressure and the predominant axial orientation of primary fibrils, enhancing their contribution to axial load resistance.
+
+Figure~\ref{fig:total_stress_strain} presents the corresponding total stress-strain curves, where both \acp{psa} yielded comparable patterns across different cartilage zones. However, minor but noticeable differences were observed, particularly during the relaxation phase, where \ac{fe} volume changes influenced volume fraction errors. The \ac{mo} effect was more obvious in the \ac{dz}, especially during relaxation, showing about a 12\% variation in strain magnitudes. These variations in the \ac{sz} and \ac{mz} were under 9\%. These particular results demonstrate the comparable accuracy of both methods, although the differences could be significant in \ac{hf} models where stress-strain data correlation is critical [\cite{eskelinen2019,liu2020,stender2016,hosseini2014}].
+%
+\begin{figure}
+\includegraphics[width=\textwidth]{img/total_stress_strain.jpg}
+\caption{Total stress vs strain plots from numerical simulations of unconfined compression experiments with (black curves) and without (red curves) \ac{mo} across different cartilage zones.}
+\label{fig:total_stress_strain}
+\end{figure}
+
+\paragraph{Joint-scale pre-stressing test.} As depicted in Fig.~\ref{fig:deformation}, the deformation in the post-pre-stressing equilibrium is determined, revealing that the \ac{sz} undergoes the most substantial deformation (reaching up to the contact points). This phenomenon occurs as this particular zone is neither entirely restricted nor subjected to any external pressure. Consequently, in numerical simulations emphasizing the stress levels in these external zones, the pre-stressing effects might be reasonably omitted. In contrast, the behavior of the deeper layers diverges from this trend.
+%
+\begin{figure}\centering
+\includegraphics[width=0.55\textwidth]{img/deformation.jpg}
+\caption{Contour plot of pre-stressed cartilage deformation.}
+\label{fig:deformation}
+\end{figure}
+
+The deeper \ac{ac} layers show minimal deformation, attributed to their connection with the subchondral bones. As shown in Fig.~\ref{fig:components}, the deeper layer experiences a fibrillar Mises stress that approximates the overall stress, with values less than $0.2$. These findings are in alignment with stresses reported in existing studies for 10\% strain in compression tests [\cite{sajjadinia2019}], underscoring the major role of pre-stressing with \ac{mo}. Moreover, these stress values can be indirectly validated by considering the pre-stresses obtained from the linear triphasic models [\cite{lai1991,setton1996}], where stress levels fluctuate below 0.4\,MPa based on the direction of the applied load. Compared to them, our large-scale results are also considered reasonable, in light of the different modeling assumptions.
+%
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{img/components.jpg}
+%\vspace{2.5cm}
+\caption{Contour plots of the stresses in the pre-stressed \ac{ac} are presented. Since the \ac{sz} values are negligible, they are not shown here. It is important to note that the constitutive equation for the fibrils is based on the highly discrete orientation of the fibrillar bundles (eq.~\ref{eq-fibril_stress}), leading to non-physiological concentrations of stress in the model. To mitigate this issue, the selection of higher-order elements or the adoption of a denser mesh could have been beneficial. However, given the good agreement of the results with the previous findings, the use of more computationally expensive meshes was deemed unnecessary.}
+\label{fig:components}
+\end{figure}
+
+\paragraph{Other discussion.} This study acknowledges certain limitations. First, the calibration of the numerical model was performed using a specific type of tensile experiment, similar to the foundational calibration test in the related \ac{psa} work [\cite{wang2018}]. In this way, we approximated the influence of our algorithm on the main constitutive parameters. Second, our \ac{psa} might introduce additional complexity into the \ac{fpbbs}, necessitating the retrieval of deformation gradient values at each integration point. Nonetheless, this is not a significant limitation, as accessing such data is necessary for the \ac{fe} implementation of our multiphasic model. Notably, our \ac{psa} method is comparatively less demanding than the other \acp{psa} that involve element-level manipulations of the \ac{fe} code, for instance, [\cite{pierce2015,weisbecker2014}].
+
+In summary, the \ac{psa} introduced in this study provides a novel and efficient computational approach to be applied to fibril-reinforced and heterogeneous AC models. Our method takes into account the experimentally-observed initial state of both constitutive and geometrical parameters. Several comparative analyses shed light on the importance of such a \ac{psa} in the stress evaluation of pre-stressed AC components. Our work also delves into large-scale pre-stressing, showing that pre-stressing can lead to considerable deformation and initial stress distribution. This highlights the criticality of accurately determining the stress-free state. Therefore, this efficient \ac{psa}, to be used in the next chapter, is deemed highly relevant in multiphasic AC research, especially in scenarios where osmotic pressure is a pivotal consideration.
+
+
+\chapter{Efficient Surrogate Modeling with Hybrid Multi-Fidelity Learning}
+
+The iterative nature of numerical modeling in cartilage biomechanics, whether with or without additional complexities such as \ac{psa}, renders most of these methods inefficient. As explained in Chapter 2, one solution is to use \ac{ml}-based surrogates. This chapter introduces a novel surrogate modeling technique using an \ac{hml} method that combines reduced-order numerical analysis with traditional supervised \ac{ml}. This method aims to train surrogates of soft tissues like cartilage with a limited number of training samples, as generating \ac{hf} numerical data with multi-physics models can be very time-consuming. The feasibility of this technique is empirically evaluated and compared with purely data-driven baselines (including \acp{gnn} and \acp{ffnn}) across diverse scales.
+
+\section{Related Work}
+
+\paragraph{Data-driven surrogates.} The application of surrogate models proved to be an efficient replacement for computationally demanding numerical models [\cite{cai2021,liu2019,martinez2017}]. Surrogate modeling finds extensive use in biomechanical studies. Examples include deformation analysis of breast and liver employing tree-based algorithms [\cite{martin-guerrero2016}], prostate modeling using \acp{ffnn} [\cite{jahya2013}], and many more. In cartilage modeling, \acp{ffnn} have been trained using data from simplified numerical models, e.g., the surrogate of the elastic model in [\cite{paiva2012}]. Another study incorporated biphasic formulations into a small-scale cartilage model surrogate but neglected the tissue's swelling [\cite{arbabi2016a}]. Further advancements were made by employing multi-physics models in surrogate training, albeit with a significant sample size of $10\,000$ [\cite{arbabi2016b}]. However, despite their potential, surrogate models are not widely utilized due to the requirement of generating costly numerical samples [\cite{frank2020}].
+
+Utilizing optimized computational code, e.g., through GPU acceleration, can mitigate the above-mentioned issue [\cite{johnsen2015}], although it might demand specific software and hardware configurations not always available [\cite{marinkovic2019}]. Another remedy is to create the surrogate with minimal data under certain conditions, such as reduced simulation scales [\cite{faisal2023}]. Nonetheless, complex multi-physics simulations might still be too costly to be implemented. If the main goal of integrating \ac{ml} is to increase efficiency, then the models should be trained with as few samples as possible. This is the main reason behind the underutilization of such AI-enhanced modeling.
+
+\paragraph{Data-efficient learning.} The challenge of small training sets in surrogate modeling can be effectively tackled by integrating physical laws and domain-specific insights into the training methodology. Such integration, as shown by \cite{kashinath2021,linka2021,hoerig2020}, has been shown to enhance performance even with limited data. These methods, despite their evident success, are still evolving and require meticulous design and complex coding. Often, they introduce new constraints to the training, such as loss function penalization in standard learning algorithms. Challenges particularly arise in dealing with multi-physics scenarios and discontinuities in mechanical models, as discussed in \cite{coutinho2023,cai2021b,karniadakis2021,fuks2020}.
+
+Another approach to manage limited data involves simplifying the numerical model to focus on key information, thus reducing the number of necessary parameters. This method is exemplified in studies by \cite{pellicer-valero2020,niroomandi2012}. The efficiency gains from such \ac{mor} methods have sparked interest in various domains, e.g., the virtual reality applications in surgical simulations [\cite{cueto2014}]. However, these methods also present challenges in implementation, as noted in the \cite{lauzeral2019} study. Considering this, multi-fidelity methods in the \ac{mor} offer an alternative, potentially implemented with non-destructive methods (without directly affecting the numerical solvers). These techniques have shown promising results across different fields, implemented with diverse \ac{ml} methods [\cite{ahn2022,zhang2022,cheng2021,yang2019}].
+
+A prevalent strategy in multi-fidelity \ac{mor}-based surrogate modeling involves using an \ac{lf} model in conjunction with an \ac{ml} model to enhance the \ac{lf} output accuracy, as detailed by \cite{peherstorfer2018}. Such models have found applications in diverse fields using various \ac{lf} modeling implementations [\cite{zhang2021,zhou2017}]. However, to our knowledge, no implementation has been done using \ac{lf} modeling for multi-physics soft tissue models, like cartilage, as proposed in our study. The proposed approach utilizes an \ac{lf} numerical part that simplifies the multi-physics equations, focusing on the tissue's approximate behavior. The accuracy of the \ac{lf} outcomes is then enhanced through an \ac{ml} model to match the \ac{hf} model's precision with non-destructive \ac{hml} implementation.
+
+\section{Methodology}
+
+\subsection{Efficient Hybrid Learning}
+
+In the following of this chapter, we use the term \ac{ml} to primarily denote the conventional \ac{ml}-based predictive models, except when specified otherwise, as illustrated in Fig.~\ref{fig:ml_system}(a). In a standard supervised learning approach, an \ac{fe} model generates various informative training samples at distinct analysis points using a comprehensive physical model. These \ac{hf} outcomes serve as the target \ac{ml} dataset, while the input features may include various physical parameters, such as boundary conditions and material properties.
+%
+\begin{figure}[H]\centering
+\includegraphics[width=\textwidth]{img/ML.pdf}
+\caption{Illustration of a standard machine learning surrogate model (a) and its integration in a hybrid machine learning (HML) framework, as connected with a simplified \ac{fe} model sequentially (b).
+\label{fig:ml_system}}
+\end{figure}
+
+In the proposed \ac{hml} approach, we initiate with an \ac{lf} model derived by simplifying the \ac{hf} equations. This computationally efficient model provides a basic estimate of the system's behavior and precedes the \ac{ml} component, which aims to refine these initial predictions to match the accuracy of the \ac{hf} model. In essence, the \ac{ml} component's input features are derived from the outputs of the \ac{lf} model, as depicted in Fig.~\ref{fig:ml_system}(b).
+
+While this methodology offers considerable flexibility in choosing the \ac{lf} model, it necessitates the creation of two distinct training datasets using varied computational techniques. Nevertheless, this may not be a significant limitation, as the \ac{lf} model is just the simplified and more efficient version of the main \ac{hf} model. Our empirical analysis, explained in the next section, indicates that this approach may also require fewer training samples overall to achieve comparable accuracy and potentially offers faster training convergence; thereby considerably mitigating the high computational demands typically associated with training and data generation.
+
+For instance, a complex \ac{hf} physical model might be defined by using biphasic equations. In contrast, a corresponding \ac{lf} model is the same \ac{fe} model but could be represented by simpler monophasic equations, which, while not capturing the intricacies of each phase, approximates the overall system response. Depending on the specific physical problem, various combinations of equations can be employed. Accordingly, in the following, we explore two different selections of \ac{lf} modeling to test the applicability of this method.
+
+\subsection{Simulation Tests}
+
+We develop two computational physics problems for generating datasets, via \ac{fe} modeling. These problems replicate standard \ac{2d} and \ac{3d} tests on artificial soft tissues, which are commonly employed in repetitive biomechanical simulations. The mathematical formulations and their computational implementations are elaborated in Chapters 2 and 3.
+
+\paragraph{2D problem.} This involves a small-scale problem where a soft biological material is subjected to 2D load testing. This is depicted in Fig.~\ref{fig:2d_model} (left). We model a rectangular specimen of dimensions $0.3 \times 1.0$\,mm$^2$ using a hybrid \ac{fe} model. A porous hyperelastic material model is used (as per eq.~\ref{eq-non_fibrillar} with $\emptyset_0^{\rm S}=0.15$), along with osmotic pre-stress (see eq.~\ref{eq-osmotic} with $\alpha_2 = 3.22$). Here, $\alpha_1$ represents the adjustable input parameter in our surrogate model. We deliberately omit fibrillar and fluid constituents for computational efficiency. Obviously, our \ac{psa} is essential for initializing the numerical experiments, while the \ac{lf} model is simplified by excluding the pre-stressing feature.
+%
+\begin{figure}\centering
+\includegraphics[width=\linewidth]{2d_model.pdf}
+\caption{Illustration of various small-scale computational samples for surrogate modeling.\label{fig:2d_model}}
+\end{figure}
+
+To assess the model's capacity to handle out-of-distribution scenarios, we also evaluate a different \ac{2d} setup; see Fig.~\ref{fig:2d_model} (right). This setup involves different load applications and geometry, specifically a $0.9 \times 0.9$\,mm$^2$ specimen with a central circular hole of $0.2$\,mm in radius. In both simulations, we fix the bottom surface of the tissue and apply displacement conditions at the top. For the mesh, the linear and plane strain triangular elements are used.
+
+\paragraph{3D problem.} Our large-scale simulations apply the tibiofemoral model introduced in Chapter 3, but they utilize different multi-physics equations. This test aims to analyze the influence of varying body weights on one of the cartilage substructures (refer to Fig~\ref{fig:3d_model}). We implement a hyperelastic equation for \ac{lf} modeling, based on eq.~\ref{eq-hyperelastic}, where $C_{10} = 2.48$\,MPa and $D_1 = 0.59$\,MPa$^{-1}$, whereas the \ac{hf} model adds also inviscid water component to the constitutive equations.
+%
+\begin{figure}\centering
+\includegraphics[width=\linewidth]{3D_model.png}
+\caption{Numerical mesh of the large-scale problem used for creating surrogate models.\label{fig:3d_model}}
+\end{figure}
+
+In the biphasic model for \ac{hf} simulations, we use first-order elements to accelerate data generation. The permeability parameters are derived from existing literature on the cartilage \ac{mz} [\cite{sajjadinia2019,stender2016}]. While the fluid is allowed to move freely across the cartilage surfaces, the weight is applied uniformly across the femur, with the fixed tibia and no flexion-extension motion.
+
+\paragraph{Datasets and evaluation.} For the datasets of the \ac{2d} models, $20$ representative samples are generated. These samples are derived from a uniform distribution ($U$), encompassing two displacement-based boundary conditions within $U$($-0.1$\,mm, $0.1$\,mm), a constitutive variable $\alpha_1$ ranging from $U$($0.005$, $0.010$\,MPa), and a one-hot vector to distinguish the fixed nodes with the others. Minor noise is introduced at each node to enhance model generalizability. Thus, the nodal coordinates are additional input features, while the introduced noise impacts the initial conditions and influences all subsequent model outputs.
+
+The outputs from both \ac{lf} and \ac{hf} simulations consist of computed nodal deformation and total stress values. For model validation, we generate $10$ additional in-distribution samples with varied inputs. Our test set, which also comprises $10$ samples, employs the out-of-distribution \ac{fe} model, testing the model's adaptability to unseen conditions.
+
+For the large-scale surrogate model, we create $100$ samples. Inputs for the \ac{hf} model include a range of the weight from $U$($-900$\,N, $-400$\,N). Outputs cover determined normal stress and strain at each node, whereas the \ac{lf} outputs focus on nodal deformation. We randomly distribute these samples across training, validation, and testing subsets, with the validation set sized at a third of the training set. The exact count of training samples is noted in the results, emphasizing the scarcity of such data.
+
+Notably, the range of \ac{2d} problem results generally falls under a similar range between $10^{-1}$ and $10^{-3}$, considering their units and absolute values. Thus, we employ an unscaled \ac{mse} metric for all node outputs in all the evaluation samples. This allows simple comparison between different training conditions. Conversely, for the \ac{3d} models, due to the vast difference in input-output scales, target feature normalization based on training samples is necessary. Although this normalization facilitates comparison across different outputs, the use of \acp{mse} can sometimes be deceptive, as it may average out anomalous nodes with scaled outputs. To address this, we use the \ac{pmse} metric, averaging these scaled values individually for each node.
+
+\paragraph{Training settings.} Our approach adapts the previously used MeshGraphNets method [\cite{pfaff2021}] for our specific \ac{2d} surrogate model needs. The original framework, based on a \ac{gnn}, incorporates a series of \acp{ffnn} organized into encoder, processor, and decoder modules [\cite{sanchez2020,battaglia2018}]. This architecture facilitates local learning at each node and connected edges, enhancing spatial equivariance through bidirectional edge sets. The core model initially encodes node and edge features into latent representations, which are then sequentially processed by message-passing blocks. While the residual connections further augment the latent vectors, enhancing the model's convergence [\cite{sanchez2020}], the final latent representation is decoded into the surrogate outputs.
+
+We diverged from the standard MeshGraphNets implementation by omitting domain-specific configurations, particularly the separate edge types, as they were irrelevant for our \ac{2d} tests lacking mechanical contact. Also, instead of the original noise strategy, we use our aforementioned noise generation method. We also revised the preprocessors and evaluation algorithms of the trained model, tailoring them for static system simulations of this study that focus solely on end conditions as outputs.
+
+To develop \ac{2d} model $1$, we employ a training method that accommodates various input sample sizes, utilizing an $L_2$ loss function for nodal results. The training involves a maximum of $1\,000$ steps, with a learning rate of $10^{-3}$ and the first ($100$) steps dedicated to initializing the online normalizer [\cite{sanchez2020}]. The model's \acp{ffnn} components comprise three hidden layers, and we included three message-passing blocks (containing such \acp{ffnn}) with a latent size of $40$.  This size is also the same as the encoder output size and the decoder input size.
+
+Furthermore, the edge sets are constructed from relative nodal distances and their euclidean norms, with the encoder's input shape set to size $3$. In the hybrid model, the node set is made by the nodal outputs, leading to an encoder's input size of $6$ and a decoder's output size of $6$. The batch size is set to the total node count of each sample (i.e., $816$), and the rest of the hyperparameters are identical to the original study.
+
+Our study also includes an empirical comparison of \ac{3d} models built using standard \acp{ffnn}. We optimized these models for rapid convergence by maintaining a minimal neuron and layer count. After extensive manual tuning of hyperparameters, \ac{3d} model $1$ was configured with four hidden layers, each containing $940$ neurons equipped with the ReLU activation functions and subsequent normalization layers. The output dimension matches the size of the total nodal results of each one of the \ac{hf} samples (i.e., $94\,032$). The input dimension of the \ac{ml} surrogate is $1$, while for the \ac{hml} model's \ac{ml} component, it equals the total nodal results of each of the \ac{lf} samples (i.e., $8\,364$). Training is conducted on a limited number of samples with a $10^{-4}$ learning rate. For the other settings, we adhere to the default library settings.
+
+In the following section, we will detail additional models, their configuration, and training to assess the impact of hyperparameters and training sample sizes.
+
+\section{Results and Discussion}
+%
+Empirical tests were conducted using various \ac{lf} and \ac{hf} computational models on a regular computer. The efficiency gains are illustrated in Fig.~\ref{fig:runtime-comparison} using a violin plot [\cite{hintze1998}]. These gains underscore the practicality of employing LF models over HF ones. Variations in the loading rate applied in the 3D simulations led to a broader range of computation times. It is important to note that in real-world scenarios, this disparity might be more pronounced, given that the HF simulations were modified in this study to expedite the process of surrogate model development.
+%
+\begin{figure}[H]\centering
+\includegraphics[trim={0cm 0.5cm 0cm 0cm},clip,width=7cm]{comparison.pdf}
+\caption{Representation of the relative decrease in runtime for HF simulations compared to LF simulations. This data is obtained by calculating the ratio of the runtime reductions to the runtimes of the LF simulations.\label{fig:runtime-comparison}}
+\end{figure}
+
+In our analysis, the runtime of \ac{ml} inference was not considered as it occurred in real time, and the majority of computational expenses were attributed to the generation of numerical data. In the following, we provide a comparative analysis of \ac{hml} and \ac{ml} methods across different simulation scenarios, highlighting the efficacy of HML models when using a limited number of HF samples. Conducting a couple of independent multi-physics tests with varying surrogate modeling assumptions enabled an effective assessment of model performance under diverse training settings.
+
+\paragraph{2D simulation.} The evaluation of \acp{mse} for both in- and out-of-distribution sets, in the context of \ac{2d} simulations, is depicted in Fig.~\ref{fig:tuner}. We deliberately use small datasets, as it is usually the case for soft material surrogate modeling [\cite{liu2019}]. The \ac{hml} frameworks demonstrate superior performance compared to \ac{ml} models. The errors in most cases for \ac{hml} models are at or below $10^{-4}$, with a notable exception being the error for the hybrid surrogate trained with four samples. However, this error is still lower than any error observed in the \ac{ml} models. Further experiments were conducted using a different setting (model $2$), characterized by less efficient, yet increased learnable parameters, as it incorporates three additional message-passing phases as the principal hyperparameter [\cite{pfaff2021}]. Even with a learning rate set to $10^{-4}$ and training steps increased by a factor of eight, the results remained consistent, underscoring the precision and generalizability of the \ac{hml} models.
+
+\begin{figure}\centering
+\includegraphics[trim={0.5cm 0.5cm 1.5cm 0cm},clip,width=\linewidth]{2d.pdf}
+\caption{Assessment of the trained models with different numbers of training samples in 2D tests. \label{fig:tuner}}
+\end{figure}
+
+Furthermore, the \ac{hml} model's methodology, mapping input features into a new representation for subsequent data-driven analysis, bears resemblance to feature-based transfer learning. In such transfer learning, source features are transformed to facilitate knowledge transfer from one domain to another [\cite{zhuang2021}]. Unlike common data-driven models, which employ feature transformation strategies [\cite{pan2011,dai2007,prague2007}], the \ac{hml} model uses a physics-based algorithm, the \ac{lf} model, for transforming input data into more informative representations. This approach mirrors the transfer learning concept and elucidates the enhanced performance of the \ac{hml} model under the constraints of efficient training settings and limited training data availability.
+
+An additional aspect of our study involved assessing how the accuracy of \ac{lf} modeling impacts the performance of \ac{hml} modeling. For this, we replicated the \ac{2d} tests using the same \ac{hml}, but substituting \ac{lf} results with \ac{hf} outcomes. As presented in Table~\ref{table:2d}, this modification yielded errors comparable to the original \ac{lf} inputs, indicating that the model, already adeptly trained with \ac{lf} data, managed to perform effectively despite the inherent stochasticity of the training process. This observation suggests that even potential inaccuracies in \ac{lf} modeling, as also reported in Chapter 3 and other \ac{psa} studies [\cite{bols2013,wang2018}], do not hinder its ability to generate an informative representation for the downstream \ac{ml} part.
+%
+\begin{table}[b]
+\centering
+\caption{Recorded MSEs ($\times 10^{-3}$) on validation/testing sets in 2D modeling.}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Surrogate model} & \multicolumn{4}{c}{\textbf{Training set size}} \\\cmidrule{2-5}
+ &    4 &   9 &   14 &    20 \\
+\midrule
+ML 1 &                     0.93 / 0.87 &  0.98 / 0.93 &  0.67 / 0.65 &  0.54 / 0.68 \\
+HML 1 &                               0.28 / 0.25 &  0.09 / 0.16 &  0.09 / 0.16 &  0.07 / 0.15 \\
+HML 1 (with HF inputs) &   0.33 / 0.26 &  0.10 / 0.16 &  0.07 / 0.13 &  0.06 / 0.12 \\
+ML 2 &                     0.94 / 1.01 & 0.92 / 0.98 &  0.64 / 0.82 &  0.55 / 0.86 \\      
+HML 2 &                               0.39 / 0.32 &  0.15 / 0.24 &  0.11 / 0.18 &  0.07 / 0.10 \\      
+HML 2 (with HF inputs) &   0.32 / 0.35 &  0.09 / 0.16 &  0.16 / 0.17 &  0.06 / 0.12 \\      
+\bottomrule
+\end{tabular}
+\label{table:2d}
+\end{table}
+
+
+\paragraph{3D simulation.}  As depicted in Fig~\ref{fig:3D}, the $l_2$ loss values captured during the training phase are compared. The \ac{3d} model $1$, incorporating the \ac{hml} framework, demonstrated superior performance over its \ac{ml} counterpart. Another variant, \ac{3d} model $2$, adhered to an identical sample regimen (comprising three training and one validation sample) yet employed the ELU activation function. The outcomes of this model variation were not markedly different, with the \ac{hml} surrogate still having a negligible error. A critical observation here is the rapid and efficient training process, as it only used $100$ epochs.
+%
+\begin{figure}\centering
+\includegraphics[trim={0.5cm 0.5cm 0.6cm 0cm},clip,width=\linewidth]{3d.pdf}
+\caption{Comparative analysis of loss values against the number of epochs in 3D surrogate modeling. It is observed that certain models achieved convergence earlier owing to the existence of the early stopping mechanism.
+\label{fig:3D}}
+\end{figure}
+
+Further exploration into the hybrid methodology was conducted through \ac{3d} model $3$ (as also summarized in Table~\ref{table:2d} for the loss values in the final epoch). This model replicated the training and validation sample sizes of its predecessors, but introduced significant modifications in the epochs and neurons count - a tenfold increase and decrease in the former and latter, respectively. Additionally, the ReLU function was utilized alongside an early stopping parameter set at $100$. Despite these alterations, the efficiency of training was maintained, even over an extensive number of epochs. However, it is noteworthy that these adjustments harmed the \ac{hml} performance, as evidenced by a surge in validation loss after approximately $30$ epochs, yet it still outperformed the \ac{ml} surrogate.
+%
+\begin{table}
+\centering
+\caption{Loss values at the final epoch on training and validation sets in 3D modeling.\label{table:3d}}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Surrogate model} &  \textbf{3D model 1} &  \textbf{3D model 2} &  \textbf{3D model 3} &  \textbf{3D model 4} \\
+\midrule
+ML (Training)   &   0.0000057 &   0.0000123 &   0.0000006 &   0.0000096 \\
+HML (Training)  &   0.0000068 &   0.0000057 &   0.0000002 &   0.0000125 \\
+ML (Validation) &   1.8169936 &   1.3181295 &   1.7773948 &   0.0076983 \\
+HML (Validation)&   0.3536258 &   0.2480008 &   0.3019600 &   0.0080819 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+For 3D model 4, the size of training and validation datasets was increased by a factor of three. We maintained hyperparameters akin to those in our first 3D model but extended the training to a maximum of $1,000$ epochs, and we used the early stopping criteria established in our third 3D model. This escalated the computational cost of our last 3D model significantly. Indeed, the increased data generation, more learnable parameters, and extended training duration led to a substantial increase in both training and computational time for numerical data generation. The findings indicate that both the \ac{ml} and \ac{hml} models yielded comparably consistent loss values upon convergence. Notably, the HML approach demonstrated a markedly faster convergence rate, recording a validation loss of $0.1$ within approximately $10$ epochs – approximately 75 times quicker than the ML model.
+
+To further interpret the performance disparity observed between the models, Fig.~\ref{fig:visualization} presents a comparative analysis of the \ac{pmse} contours, applied to a reference state of one cartilage substructure. The first three ML models displayed suboptimal performance across various points, whereas their \ac{hml} counterparts achieved significantly higher accuracy levels, with minimal pointwise error outliers (evidenced by sparse small red areas). The fourth \ac{ml} model exhibited comparable accuracy levels to the \ac{hml} model, with minor differences. However, in this inefficient surrogate modeling scenario, there was also a greater frequency of pointwise errors, suggesting a preference for the other more efficient \ac{hml} models. Again, this analysis emphasizes the benefits of adopting \ac{hml} modeling techniques, particularly in scenarios with limited data availability.
+%
+\begin{figure}[H]\centering
+\includegraphics[trim={4.8cm 16.5cm 15cm 5cm},clip,width=1\linewidth,height=0.9\textheight,keepaspectratio]{visualization_3d.pdf}
+\caption{Illustration of PMSE contours for all three-dimensional surrogate models.}\label{fig:visualization}
+\end{figure}
+
+\paragraph{Other discussion.} This work acknowledges certain limitations. Firstly, we simplified the \ac{hf} numerical models for efficient data acquisition; however, this does not majorly impair the study as the simulations primarily aim to highlight the efficacy of the hybrid approach in biomechanical simulations in general, rather than serving as clinically validated \ac{ac} models. Secondly, the empirical experiments presupposed that the training phases should not substantially exceed the numerical data generation in cost, to justify the adoption of these surrogate models. Consequently, expensive settings for surrogate training were not employed. While this may restrict our findings to the specific conditions of our models, such presumptions are often necessary when utilizing surrogate models on regular hardware settings.
+
+In summary, this chapter introduces an \ac{hml} methodology for multi-fidelity-based surrogate modeling and \ac{fe} analysis of cartilage-like soft tissues. The \ac{lf} model in this context is derived by simplifying the multi-physics formulations, making the \ac{mor} process relatively direct and non-invasive. Extensive empirical evaluations also reveal that our hybrid approach enhances training efficiency and improves the performance of surrogate modeling with minimal training data. This is particularly beneficial, as it overcomes the challenge faced by many existing \ac{ml}-based surrogate models that usually require numerous costly \ac{hf} samples.
+
+
+
+
+
+
+
+
+
+\chapter{Efficient and Generalizable Learning for Surrogate Modeling}
+Chapter text
+
+\section{Related Work}
+
+%The paper proposes a novel data augmentation method for \ac{dl} to enhance temperature field prediction with limited training samples. This method uses pairwise temperature field differences as augmented data, leveraging the inter-sample differences and improving training efficiency. By constructing pairwise differences, it exponentially increases the number of training samples, substantially augmenting the data set and enhancing the model's predictive performance. Additionally, deep transfer learning is integrated, adapting the DNN to different heat source layout temperature field prediction (HSL-TFP) tasks, and utilizing knowledge from similar problems to expedite learning across various HSL-TFP scenarios. This combination of data augmentation and deep transfer learning significantly improves prediction accuracy even with a small sample size [\cite{zhao2021}].
+
+%The paper presents a machine learning-based surrogate modeling framework for predicting the response of nonlinear structures to earthquakes. This framework involves using Singular Value Decomposition (SVD) for ground motion characterization, allowing for the generation of a wide range of earthquake scenarios for model training. The training process involves input-output pairs from finite element simulations, with the output being structural responses like peak inter-story drift and floor acceleration. The surrogate models are validated using unseen earthquakes and material parameters, demonstrating their effectiveness in accurately predicting structural responses to a variety of seismic conditions [\cite{parida2023}].
+
+%The paper introduces a novel approach for data augmentation in earthquake engineering using Discrete Wavelet Transform (DWT). This technique enhances the characterization and augmentation of earthquake data for training deep learning-based surrogate models. DWT is utilized for both feature extraction and data augmentation, efficiently augmenting small datasets of earthquake records. First, an original earthquake signal is decomposed into its wavelet coefficients using DWT. Then the coefficients are perturbed. The augmented sample can be extracted from the reconstruction. The Discrete Wavelet Transform (DWT) is a mathematical technique used for signal processing and data analysis. It decomposes a signal into wavelets, which are small waves located in different parts of the signal. Unlike Fourier Transform, which only analyzes frequency components, DWT provides both time and frequency information, making it particularly useful for analyzing non-stationary signals (signals whose frequency components change over time). This makes DWT effective for feature extraction and data augmentation in various applications [\cite{parida2023a}].
+
+%Data augmentation was utilized to account for orientation invariance in the context of CNN surrogate models [\cite{dong2022}].
+
+%The data augmentation method augments the HF training dataset with the synthetic data generated from the LF training data. While we can train our multi-fidelity surrogate model directly with this augmented dataset, we know that the synthetic data is lower-fidelity, thus they are weighted [\cite{sella2023}].
+
+\section{Methodology}
+%
+
+\subsection{Efficient and Generalizable learning}
+%
+
+
+\subsection{Simulation Tests}
+%
+
+\section{Results and Discussion}
+%
+\begin{table}
+\caption{Runtimes (Min) with their mean and standard deviation for each model.}\centering
+\label{tabel:runtimes_stats}
+\begin{tabular}{lcc}
+\toprule
+ & Small-scale simulation & Large-scale simulation \\
+\midrule
+HF model & 21.21 ± 2.16 & 118.31 ± 6.42 \\
+LF model & 1.31 ± 0.69 & 3.07 ± 0.27 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\chapter{Conclusion}
+
+% cartilage damage studies \cite{zevenbergen2018,elahi2021,elahi2023}, large-scale modeling \cite{lenhart2015}, repetitive algorithm of cartilage FEA \cite{elahi2021}, small-scale cartilage model with osmotic pressure \cite{elahi2023}, open-source machine learning \cite{panfilov2019,desai2019,desai2021,thomas2021,panfilov2022} with more advanced open-sourced biomechanical and numerical studies \cite{fehervary2020,maes2023,chokhandre2021}
+
+
+% Our experiments included some (but typical) types of the biomechanical simulations to evaluate the role our hybrid method can play. Admittedly, if more different types of simulations had been used, we would have obtained more generalizable results. However, these \ac{hf} simulations may have non-trivial implementations with private datasets and are therefore left to the future. 
+
+% References
+
+\printbibliography[title={References}, heading=bibintoc]
+
+% Appendices
+%\renewcommand{\appendixname}{Appendices}
+%\appendix
+
+\begin{appendices}
+\chapter{Runtime Details}
+%\addcontentsline{toc}{chapter}{Appendix A: Runtime Details}
+%\addtocontents{toc}{\protect\vskip4pt}
+
+\begin{longtable}{lcccc}
+\caption{Runtime details corresponding data generation of small-scale numerical samples used in Chapter 4.}
+\label{table:hml_2d_runtime}
+\\\toprule
+\textbf{2D Sample} & \multicolumn{2}{c}{\textbf{LF model}} & \multicolumn{2}{c}{\textbf{HF model}} \\\cmidrule{2-3} \cmidrule{4-5}
+ & {Min} & {Sec} & {Min}  & {Sec} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\ldots continued}\\\toprule
+\textbf{2D Sample} & \multicolumn{2}{c}{\textbf{LF model}} & \multicolumn{2}{c}{\textbf{HF model}} \\\cmidrule{2-3} \cmidrule{4-5}
+ & {Min} & {Sec} &  {Min}  & {Sec} \\
+\midrule
+\endhead
+1   &   0 &  21 &   2 &  21 \\
+2   &   0 &  21 &   2 &  21 \\
+3   &   0 &  21 &   2 &  21 \\
+4   &   0 &  21 &   2 &  21 \\
+5   &   0 &  21 &   2 &  21 \\
+6   &   0 &  21 &   2 &  21 \\
+7   &   0 &  21 &   2 &  20 \\
+8   &   0 &  21 &   2 &  19 \\
+9   &   0 &  21 &   2 &  22 \\
+10  &   0 &  21 &   2 &  21 \\
+11  &   0 &  21 &   2 &  21 \\
+12  &   0 &  21 &   2 &  21 \\
+13  &   0 &  21 &   2 &  21 \\
+14  &   0 &  21 &   2 &  21 \\
+15  &   0 &  21 &   2 &  21 \\
+16  &   0 &  21 &   2 &  21 \\
+17  &   0 &  21 &   2 &  21 \\
+18  &   0 &  21 &   2 &  22 \\
+19  &   0 &  21 &   2 &  21 \\
+20  &   0 &  21 &   2 &  22 \\
+21  &   0 &  21 &   2 &  21 \\
+22  &   0 &  21 &   2 &  22 \\
+23  &   0 &  21 &   2 &  22 \\
+24  &   0 &  21 &   2 &  22 \\
+25  &   0 &  21 &   2 &  22 \\
+26  &   0 &  21 &   2 &  21 \\
+27  &   0 &  21 &   2 &  21 \\
+28  &   0 &  21 &   2 &  22 \\
+29  &   0 &  21 &   2 &  22 \\
+30  &   0 &  21 &   2 &  22 \\
+31  &   0 &  24 &   2 &  11 \\
+32  &   0 &  18 &   2 &  10 \\
+33  &   0 &  18 &   2 &  10 \\
+34  &   0 &  18 &   2 &  10 \\
+35  &   0 &  18 &   2 &  10 \\
+36  &   0 &  19 &   2 &  11 \\
+37  &   0 &  18 &   2 &  11 \\
+38  &   0 &  18 &   1 &  51 \\
+39  &   0 &  18 &   2 &  10 \\
+40  &   0 &  18 &   2 &  11 \\
+\bottomrule
+\end{longtable}
+
+\begin{longtable}{lcccc}
+\caption{Runtime details corresponding data generation of large-scale numerical samples used in Chapter 4.}
+\label{table:hml_3d_runtime}
+\\\toprule
+\textbf{3D Sample} & \multicolumn{2}{c}{\textbf{LF model}} & \multicolumn{2}{c}{\textbf{HF model}} \\\cmidrule{2-3} \cmidrule{4-5}
+ & {Min} & {Sec} &  {Min}  & {Sec} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\ldots continued}\\\toprule
+\textbf{3D Sample} & \multicolumn{2}{c}{\textbf{LF model}} & \multicolumn{2}{c}{\textbf{HF model}} \\\cmidrule{2-3} \cmidrule{4-5}
+ & {Min} & {Sec} &  {Min}  & {Sec} \\
+\midrule
+\endhead
+1   &   1 &  22 &  10 &  22 \\
+2   &   1 &   5 &   7 &  31 \\
+3   &   1 &   1 &   7 &  37 \\
+4   &   1 &  51 &  14 &  23 \\
+5   &   1 &   9 &  11 &  53 \\
+6   &   1 &   7 &  11 &  40 \\
+7   &   1 &  19 &   9 &  54 \\
+8   &   1 &  11 &  12 &   2 \\
+9   &   1 &  31 &   9 &   2 \\
+10  &   1 &  23 &  12 &  19 \\
+11  &   1 &   3 &   7 &  11 \\
+12  &   1 &  15 &  11 &  27 \\
+13  &   1 &  23 &   8 &  37 \\
+14  &   1 &  53 &  14 &  22 \\
+15  &   1 &  13 &   7 &  15 \\
+16  &   1 &  25 &  14 &  50 \\
+17  &   1 &   5 &   4 &   2 \\
+18  &   1 &  17 &  11 &  40 \\
+19  &   1 &   7 &   7 &  29 \\
+20  &   1 &   5 &   7 &  18 \\
+21  &   0 &  59 &   7 &  25 \\
+22  &   2 &   3 &  20 &  48 \\
+23  &   1 &  15 &  12 &  36 \\
+24  &   1 &  29 &   9 &  57 \\
+25  &   1 &  11 &   7 &  20 \\
+26  &   1 &  21 &  12 &  14 \\
+27  &   1 &  17 &   7 &  13 \\
+28  &   1 &   5 &   8 &   7 \\
+29  &   1 &  23 &  13 &  50 \\
+30  &   1 &  11 &  12 &  58 \\
+31  &   1 &   0 &   7 &  55 \\
+32  &   2 &  13 &  17 &  15 \\
+33  &   1 &   7 &   7 &  53 \\
+34  &   1 &  25 &  15 &  43 \\
+35  &   1 &   5 &   7 &  42 \\
+36  &   1 &   9 &   7 &  25 \\
+37  &   1 &   9 &  10 &  30 \\
+38  &   1 &   3 &   4 &  18 \\
+39  &   1 &  19 &  10 &   5 \\
+40  &   1 &  23 &  14 &  18 \\
+41  &   1 &  11 &  10 &  58 \\
+42  &   1 &  17 &   7 &  55 \\
+43  &   1 &  13 &  11 &  52 \\
+44  &   1 &  29 &  15 &  39 \\
+45  &   1 &  13 &  13 &  14 \\
+46  &   1 &   7 &   4 &  36 \\
+47  &   1 &  17 &  19 &  32 \\
+48  &   1 &  19 &  10 &  28 \\
+49  &   1 &   3 &   7 &  35 \\
+50  &   1 &   7 &   4 &  14 \\
+51  &   1 &  21 &  14 &   1 \\
+52  &   1 &  21 &  12 &  36 \\
+53  &   1 &  43 &  13 &  10 \\
+54  &   1 &  23 &  15 &   5 \\
+55  &   1 &   4 &   9 &   5 \\
+56  &   1 &  23 &  13 &  38 \\
+57  &   2 &   3 &  21 &  21 \\
+58  &   1 &  21 &   9 &  39 \\
+59  &   1 &  17 &  10 &  17 \\
+60  &   1 &   7 &   7 &  25 \\
+61  &   1 &   7 &   8 &  29 \\
+62  &   1 &   3 &   8 &  48 \\
+63  &   1 &  53 &  14 &  19 \\
+64  &   1 &  19 &   9 &   4 \\
+65  &   1 &  51 &  13 &  52 \\
+66  &   1 &  43 &  15 &   7 \\
+67  &   1 &  15 &  13 &  25 \\
+68  &   1 &   9 &  11 &  31 \\
+69  &   1 &   7 &   7 &  23 \\
+70  &   1 &  33 &  13 &   3 \\
+71  &   1 &  17 &  18 &  24 \\
+72  &   1 &  43 &  13 &  36 \\
+73  &   1 &  21 &   9 &  36 \\
+74  &   1 &  15 &   9 &  18 \\
+75  &   1 &   3 &   7 &  40 \\
+76  &   1 &  23 &  12 &  21 \\
+77  &   1 &  11 &  10 &  10 \\
+78  &   1 &  19 &   9 &  50 \\
+79  &   2 &   5 &  13 &   1 \\
+80  &   1 &  17 &   9 &   8 \\
+81  &   1 &  21 &  12 &  17 \\
+82  &   1 &  39 &  14 &  36 \\
+83  &   1 &   7 &  11 &  31 \\
+84  &   1 &  37 &  13 &   3 \\
+85  &   1 &   7 &   7 &   8 \\
+86  &   1 &  23 &   9 &  42 \\
+87  &   2 &  17 &  15 &  32 \\
+88  &   1 &  17 &   8 &  42 \\
+89  &   1 &  13 &   9 &  58 \\
+90  &   1 &  19 &   8 &  34 \\
+91  &   1 &   5 &   3 &  54 \\
+92  &   1 &   5 &   8 &  28 \\
+93  &   1 &   7 &   7 &   7 \\
+94  &   1 &   9 &  10 &  37 \\
+95  &   1 &  11 &   9 &  54 \\
+96  &   1 &   5 &   7 &   7 \\
+97  &   1 &   1 &   8 &   8 \\
+98  &   2 &  11 &  15 &   8 \\
+99  &   1 &   1 &   8 &   2 \\
+100 &   1 &   2 &   4 &   6 \\
+\bottomrule
+\end{longtable}
+
+\begin{longtable}{lcccc}
+\caption{Runtime details corresponding data generation of large-scale numerical samples used in Chapter 5.}
+\label{table:smallscale_runtime}
+\\\toprule
+\textbf{Small-scale sample} & \multicolumn{2}{c}{\textbf{LF model}} & \multicolumn{2}{c}{\textbf{HF model}} \\\cmidrule{2-3} \cmidrule{4-5}
+ & {Min} & {Sec} & {Min}  & {Sec} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\ldots continued}\\\toprule
+\textbf{Small-scale sample} & \multicolumn{2}{c}{\textbf{LF model}} & \multicolumn{2}{c}{\textbf{HF model}} \\\cmidrule{2-3} \cmidrule{4-5}
+ & {Min} & {Sec} &  {Min}  & {Sec} \\
+\midrule
+\endhead
+
+1 & 1 & 1 & 21 & 29 \\
+2 & 1 & 16 & 18 & 54 \\
+3 & 0 & 56 & 21 & 53 \\
+4 & 0 & 48 & 19 & 54 \\
+5 & 3 & 56 & 19 & 51 \\
+6 & 1 & 1 & 20 & 0 \\
+7 & 0 & 56 & 23 & 4 \\
+8 & 1 & 36 & 18 & 7 \\
+9 & 1 & 31 & 16 & 44 \\
+10 & 0 & 51 & 16 & 7 \\
+11 & 0 & 46 & 19 & 39 \\
+12 & 0 & 52 & 21 & 13 \\
+13 & 1 & 21 & 19 & 38 \\
+14 & 1 & 6 & 18 & 16 \\
+15 & 2 & 46 & 22 & 21 \\
+16 & 1 & 21 & 19 & 19 \\
+17 & 1 & 31 & 19 & 53 \\
+18 & 0 & 56 & 21 & 22 \\
+19 & 0 & 51 & 20 & 13 \\
+20 & 0 & 46 & 23 & 6 \\
+21 & 0 & 52 & 22 & 27 \\
+22 & 1 & 6 & 20 & 43 \\
+23 & 1 & 32 & 18 & 10 \\
+24 & 1 & 21 & 19 & 0 \\
+25 & 1 & 6 & 22 & 52 \\
+26 & 1 & 42 & 24 & 10 \\
+27 & 4 & 12 & 19 & 10 \\
+28 & 1 & 22 & 20 & 45 \\
+29 & 0 & 46 & 21 & 20 \\
+30 & 1 & 26 & 24 & 3 \\
+31 & 2 & 1 & 21 & 32 \\
+32 & 1 & 12 & 21 & 45 \\
+33 & 1 & 41 & 21 & 41 \\
+34 & 1 & 6 & 27 & 0 \\
+35 & 0 & 56 & 23 & 56 \\
+36 & 0 & 46 & 21 & 34 \\
+37 & 1 & 1 & 20 & 55 \\
+38 & 1 & 2 & 22 & 32 \\
+39 & 1 & 8 & 17 & 42 \\
+40 & 0 & 56 & 24 & 11 \\
+41 & 0 & 52 & 22 & 54 \\
+42 & 1 & 56 & 22 & 14 \\
+43 & 0 & 58 & 23 & 9 \\
+44 & 0 & 46 & 21 & 35 \\
+45 & 1 & 11 & 20 & 20 \\
+46 & 0 & 56 & 22 & 37 \\
+47 & 1 & 11 & 21 & 6 \\
+48 & 1 & 21 & 21 & 27 \\
+49 & 1 & 21 & 23 & 45 \\
+50 & 1 & 6 & 24 & 38 \\
+\bottomrule
+\end{longtable}
+
+\begin{longtable}{lcccc}
+\caption{Runtime details corresponding data generation of small-scale numerical samples used in Chapter 5.}
+\label{table:largescale_runtime}
+\\\toprule
+\textbf{Large-scale sample} & \multicolumn{2}{c}{\textbf{LF model}} & \multicolumn{2}{c}{\textbf{HF model}} \\\cmidrule{2-3} \cmidrule{4-5}
+ & {Min} & {Sec} & {Min}  & {Sec} \\
+\midrule
+\endfirsthead
+\multicolumn{5}{@{}l}{\ldots continued}\\\toprule
+\textbf{Large-scale sample} & \multicolumn{2}{c}{\textbf{LF model}} & \multicolumn{2}{c}{\textbf{HF model}} \\\cmidrule{2-3} \cmidrule{4-5}
+ & {Min} & {Sec} &  {Min}  & {Sec} \\
+\midrule
+\endhead
+1 & 3 & 0 & 120 & 55 \\
+2 & 3 & 2 & 110 & 59 \\
+3 & 3 & 28 & 114 & 38 \\
+4 & 2 & 54 & 114 & 4 \\
+5 & 3 & 14 & 120 & 23 \\
+6 & 2 & 42 & 128 & 48 \\
+\bottomrule
+\end{longtable}
+
+\chapter{Supplemental Results}
+%\addcontentsline{toc}{chapter}{Appendix B: Supplemental Results}
+
+\begin{table}[H]
+\centering
+\caption{In-distribution MSE of the small-scale model used in chapter 5 with message passings: 2.}
+\label{table_in_distribution_2}
+\begin{tabular}{lcccccccc}
+\toprule
+ & \multicolumn{2}{r}{\textbf{CR: 4}} & \multicolumn{2}{r}{\textbf{CR 2}} & \multicolumn{2}{r}{\textbf{CR: 1}} & \multicolumn{2}{r}{\textbf{CR: 0.5}} \\
+ \cmidrule{2-9}
+\textbf{Model type} / with AE & No & Yes & No & Yes & No & Yes & No & Yes \\
+\midrule
+\textbf{Dynamic subgraphing} & 0.08 & 0.13 & 0.11 & 0.08 & 0.07 & 0.07 & 0.07 & 0.08 \\
+\textbf{Static subgraphing} & 0.15 & 0.17 & 0.09 & 0.25 & 0.10 & 0.15 & 0.10 & 0.99 \\
+\textbf{Dynamic weighting} & 0.09 & 0.27 & 0.07 & 0.19 & 0.08 & 0.40 & 0.07 & 0.53 \\
+\textbf{Static weighting} & 0.08 & 0.21 & 0.06 & 0.31 & 0.07 & 0.41 & 0.07 & 0.34 \\
+\textbf{Maximal loss} & 0.08 & 0.17 & 0.07 & 1.10 & 0.08 & 0.76 & 0.08 & 1.44 \\
+\textbf{$\boldsymbol{l_2}$ loss} & 0.07 & 0.13 & 0.08 & 0.20 & 0.08 & 0.18 & 0.05 & 0.34 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{In-distribution MSE of the small-scale model used in chapter 5 with message passings: 5.}
+\label{table_in_distribution_5}
+\begin{tabular}{lcccccccc}
+\toprule
+ & \multicolumn{2}{r}{\textbf{CR: 4}} & \multicolumn{2}{r}{\textbf{CR 2}} & \multicolumn{2}{r}{\textbf{CR: 1}} & \multicolumn{2}{r}{\textbf{CR: 0.5}} \\
+ \cmidrule{2-9}
+\textbf{Model type} / with AE & No & Yes & No & Yes & No & Yes & No & Yes \\
+\midrule
+\textbf{Dynamic subgraphing} & 0.06 & 0.10 & 0.08 & 0.09 & 0.17 & 0.06 & 0.10 & 0.07 \\
+\textbf{Static subgraphing} & 0.10 & 0.41 & 0.10 & 0.30 & 0.09 & 0.28 & 0.10 & 1.11 \\
+\textbf{Dynamic weighting} & 0.09 & 0.26 & 0.07 & 0.30 & 0.07 & 0.22 & 0.08 & 0.23 \\
+\textbf{Static weighting} & 0.08 & 0.20 & 0.08 & 0.32 & 0.08 & 0.16 & 0.07 & 0.19 \\
+\textbf{Maximal loss} & 0.06 & 1.80 & 0.06 & 0.33 & 0.07 & 7.48 & 0.07 & 1.10 \\
+\textbf{$\boldsymbol{l_2}$ loss} & 0.06 & 0.36 & 0.09 & 0.16 & 0.08 & 26.07 & 0.07 & 0.19 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Out-of-distribution MSE of the full model used in chapter 5 with compression ratio 4 and number of message passings 2.}
+\label{table_4_2}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{\textbf{With augmentation}} & \multicolumn{2}{c}{\textbf{Without augmentation}} \\
+ \cmidrule{2-3} \cmidrule{4-5}
+\textbf{Model type} & With AE & Without AE & With AE & Without AE \\
+\midrule
+\textbf{Dynamic subgraphing} & 0.08 & 0.06 & 0.25 & 0.09 \\
+\textbf{Static subgraphing} & 0.32 & 0.10 & 0.68 & 0.52 \\
+\textbf{Dynamic weighting} & 0.05 & 0.12 & 0.25 & 8.07 \\
+\textbf{Static weighting} & 0.08 & 0.46 & 0.31 & 0.54 \\
+\textbf{Maximal loss} & 0.05 & 0.10 & 0.28 & 10.65 \\
+\textbf{$\boldsymbol{l_2}$ loss} & 0.08 & 0.07 & 0.60 & 0.83 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Out-of-distribution MSE of the full model used in chapter 5 with compression ratio 4 and number of message passings 5.}
+\label{table_4_5}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{\textbf{With augmentation}} & \multicolumn{2}{c}{\textbf{Without augmentation}} \\
+ \cmidrule{2-3} \cmidrule{4-5}
+\textbf{Model type} & With AE & Without AE & With AE & Without AE \\
+\midrule
+\textbf{Dynamic subgraphing} & 0.86 & 0.12 & 4.08 & 1.30 \\
+\textbf{Static subgraphing} & 0.12 & 0.45 & 10.03 & 1.40 \\
+\textbf{Dynamic weighting} & 0.15 & 0.23 & 0.11 & 0.49 \\
+\textbf{Static weighting} & 0.08 & 0.18 & 0.09 & 0.98 \\
+\textbf{Maximal loss} & 0.08 & 1.71 & 0.23 & 0.42 \\
+\textbf{$\boldsymbol{l_2}$ loss} & 0.08 & 0.32 & 6.46 & 0.63 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Out-of-distribution MSE of the full model used in chapter 5 with compression ratio 2 and number of message passings 2.}
+\label{table_2_2}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{\textbf{With augmentation}} & \multicolumn{2}{c}{\textbf{Without augmentation}} \\
+ \cmidrule{2-3} \cmidrule{4-5}
+\textbf{Model type} & With AE & Without AE & With AE & Without AE \\
+\midrule
+\textbf{Dynamic subgraphing} & 0.59 & 0.06 & 0.34 & 0.66 \\
+\textbf{Static subgraphing} & 0.17 & 0.32 & 0.39 & 2.49 \\
+\textbf{Dynamic weighting} & 0.09 & 0.23 & 0.22 & 0.43 \\
+\textbf{Static weighting} & 0.08 & 0.32 & 1.10 & 0.39 \\
+\textbf{Maximal loss} & 0.05 & 0.50 & 1.02 & 0.29 \\
+\textbf{$\boldsymbol{l_2}$ loss} & 0.07 & 0.15 & 0.30 & 1.25 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Out-of-distribution MSE of the full model used in chapter 5 with compression ratio 2 and number of message passings 5.}
+\label{table_2_5}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{\textbf{With augmentation}} & \multicolumn{2}{c}{\textbf{Without augmentation}} \\
+ \cmidrule{2-3} \cmidrule{4-5}
+\textbf{Model type} & With AE & Without AE & With AE & Without AE \\
+\midrule
+\textbf{Dynamic subgraphing} & 0.05 & 0.08 & 37.78 & 32.42 \\
+\textbf{Static subgraphing} & 1.89 & 1.82 & 91.06 & 55.82 \\
+\textbf{Dynamic weighting} & 0.06 & 0.20 & 0.94 & 0.52 \\
+\textbf{Static weighting} & 0.18 & 0.16 & 0.58 & 0.32 \\
+\textbf{Maximal loss} & 0.07 & 0.11 & 1681.98 & 689.35 \\
+\textbf{$\boldsymbol{l_2}$ loss} & 0.28 & 2.94 & 14.18 & 688.89 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Out-of-distribution MSE of the full model used in chapter 5 with compression ratio 1 and number of message passings 2.}
+\label{table_1_2}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{\textbf{With augmentation}} & \multicolumn{2}{c}{\textbf{Without augmentation}} \\
+ \cmidrule{2-3} \cmidrule{4-5}
+\textbf{Model type} & With AE & Without AE & With AE & Without AE \\
+\midrule
+\textbf{Dynamic subgraphing} & 0.10 & 0.22 & 0.62 & 0.39 \\
+\textbf{Static subgraphing} & 0.23 & 0.07 & 0.29 & 1.06 \\
+\textbf{Dynamic weighting} & 0.09 & 0.34 & 0.54 & 0.55 \\
+\textbf{Static weighting} & 0.08 & 0.34 & 0.35 & 0.57 \\
+\textbf{Maximal loss} & 0.10 & 0.64 & 3.47 & 37.13 \\
+\textbf{$\boldsymbol{l_2}$ loss} & 0.07 & 0.14 & 0.28 & 0.34 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Out-of-distribution MSE of the full model used in chapter 5 with compression ratio 1 and number of message passings 5.}
+\label{table_1_5}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{\textbf{With augmentation}} & \multicolumn{2}{c}{\textbf{Without augmentation}} \\
+ \cmidrule{2-3} \cmidrule{4-5}
+\textbf{Model type} & With AE & Without AE & With AE & Without AE \\
+\midrule
+\textbf{Dynamic subgraphing} & 0.62 & 0.41 & 691.12 & 14897.00 \\
+\textbf{Static subgraphing} & 25.32 & 11.17 & 3596.38 & 1877.03 \\
+\textbf{Dynamic weighting} & 0.14 & 0.08 & 0.28 & 0.58 \\
+\textbf{Static weighting} & 0.08 & 0.09 & 0.49 & 0.46 \\
+\textbf{Maximal loss} & 0.07 & 0.41 & 6.64 & 309.16 \\
+\textbf{$\boldsymbol{l_2}$ loss} & 0.71 & 8.23 & 1.68 & 440.18 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Out-of-distribution MSE of the full model used in chapter 5 with compression ratio 0.5 and number of message passings 2.}
+\label{table_0.5_2}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{\textbf{With augmentation}} & \multicolumn{2}{c}{\textbf{Without augmentation}} \\
+ \cmidrule{2-3} \cmidrule{4-5}
+\textbf{Model type} & With AE & Without AE & With AE & Without AE \\
+\midrule
+\textbf{Dynamic subgraphing} & 0.39 & 0.54 & 15.55 & 1.55 \\
+\textbf{Static subgraphing} & 0.13 & 0.68 & 3.63 & 1.97 \\
+\textbf{Dynamic weighting} & 0.08 & 0.55 & 0.46 & 0.54 \\
+\textbf{Static weighting} & 0.08 & 0.29 & 0.31 & 0.49 \\
+\textbf{Maximal loss} & 0.06 & 0.88 & 19.46 & 3.42 \\
+\textbf{$\boldsymbol{l_2}$ loss} & 0.13 & 5.60 & 0.67 & 0.66 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\centering
+\caption{Out-of-distribution MSE of the full model used in chapter 5 with compression ratio 0.5 and number of message passings 5.}
+\label{table_0.5_5}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{\textbf{With augmentation}} & \multicolumn{2}{c}{\textbf{Without augmentation}} \\
+ \cmidrule{2-3} \cmidrule{4-5}
+\textbf{Model type} & With AE & Without AE & With AE & Without AE \\
+\midrule
+\textbf{Dynamic subgraphing} & 0.40 & 0.17 & 147349.36 & 24.95 \\
+\textbf{Static subgraphing} & 0.52 & 4.91 & 16.17 & 63.97 \\
+\textbf{Dynamic weighting} & 0.12 & 0.18 & 1.78 & 0.19 \\
+\textbf{Static weighting} & 0.09 & 0.12 & 2.14 & 0.89 \\
+\textbf{Maximal loss} & 0.06 & 1.30 & 32.32 & 50.76 \\
+\textbf{$\boldsymbol{l_2}$ loss} & 0.18 & 0.22 & 134.38 & 41.25 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{appendices}
+
+\end{document}
+
