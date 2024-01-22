@@ -4,7 +4,8 @@
 \usepackage{enumitem}
 \usepackage{calc}
 \usepackage{setspace}
-\usepackage{multicol}
+%\usepackage{multicol}
+\usepackage{rotating}
 
 \onehalfspacing % Adjusted line spacing
 
@@ -157,12 +158,6 @@ This work is based on the following relevant research outputs:
 \tableofcontents
 \newpage
 
-\listoffigures\addcontentsline{toc}{chapter}{List of Figures}
-\newpage
-
-\listoftables\addcontentsline{toc}{chapter}{List of Tables}
-\newpage
-
 \chapter*{List of Acronyms}\addcontentsline{toc}{chapter}{List of Acronyms}
 %
 %\begin{multicols}{2}
@@ -192,11 +187,13 @@ This work is based on the following relevant research outputs:
 \end{description}
 %\end{multicols}
 
-% Start page numbering with Arabic numerals
-\pagenumbering{arabic}
+\listoffigures\addcontentsline{toc}{chapter}{List of Figures}
+\newpage
 
-% Sample Chapters
-\chapter{Introduction}
+\listoftables\addcontentsline{toc}{chapter}{List of Tables}
+\newpage
+
+\chapter{Introduction}\pagenumbering{arabic}
 
 \Ac{ac}, a soft tissue that provides smooth load-bearing between articulating bones with excellent lubrication, allows for pain-free movement. This tissue, under normal conditions, shows remarkable shock-absorbing properties and resistance [\cite{lu2008}]. However, biomechanical factors, such as extreme loads on the tissue, can cause significant damage to it, leading to substantial health care expenditures [\cite{salmon2016}]. Understanding the biomechanics of cartilage is therefore crucial, particularly for early damage detection or prevention [\cite{moreno2019}].
 
@@ -215,9 +212,11 @@ The aim of this project is to develop a new computer simulation tool that balanc
     \item What are the potential implications of the proposed methods for future research?
 \end{enumerate}
 
+In the subsequent chapter, we provide a comprehensive overview of the theoretical foundations, encompassing aspects of numerical analysis, biomechanics, and data-driven methodologies, culminating with a simplified illustration of a surrogate model to aid in understanding. Following this, the chapter thereafter delves into the first research question, presenting the development of a novel complex yet fully automated multi-physics model. It is particularly emphasized that special consideration must be given to the tissue pre-stressing, which will be demonstrated to be crucial for \ac{hf} simulations across various scales.
 
-Two major innovative ideas are proposed in this project, including the multi-fidelity machine-learning-based cartilage model and the efficient multi-physics model needed for training it as distinct from the former cartilage studies that either targeted more at the high-fidelity learning methods or purely numerical models (which are expensive). This research would be a considerable contribution to a series of studies, aiming at proposing a feasible algorithm for the efficient analysis of cartilage. Thus, the results of this study can be published in leading venues.
+Chapter 5 introduces a novel \ac{hml}, integrating \ac{ml} with a reduced-order, \ac{lf}, numerical approach. This model, as we will demonstrate, achieves sufficient accuracy even with limited \ac{hf} data and boasts efficient training processes, thereby addressing the third research question. We further enhance this \ac{hml} technique by incorporating additional techniques such as data augmentation, improving its ability to generalize across different scales and thus responding to the third question.
 
+The final chapter summarizes the innovative contributions of this work and provides direct responses to the research questions, including the last question regarding the possible future directions.
 
 \chapter{Review of Preliminaries}
 This work draws from diverse disciplines, each of which may be the primary focus of distinct research groups. Recognizing that many readers might not be thoroughly versed in all these areas, this chapter aims to present an overview of the foundational concepts, with the assumption that readers have a basic understanding of tensor calculus [\cite{fleisch2011}], linear algebra [\cite{strang2023}], and stochastic programming [\cite{birge2011}]. The opening section elucidates the principles of cartilage biomechanics, exploring both joint scale and tissue scale properties. Subsequent sections delve into the intricacies of implicit \ac{fe} analysis and its mathematical intricacies that are used to generate the datasets. The final section unfolds machine learning techniques, highlighting their prominence in this context. This chapter is finished, by implementing a simplified and educational example.
@@ -1027,7 +1026,7 @@ In the following section, we will detail additional models, their configuration,
 %
 Empirical tests were conducted using various \ac{lf} and \ac{hf} computational models on a regular computer. The efficiency gains are illustrated in Fig.~\ref{fig:runtime-comparison} using a violin plot [\cite{hintze1998}]. These gains underscore the practicality of employing LF models over HF ones. Variations in the loading rate applied in the 3D simulations led to a broader range of computation times. It is important to note that in real-world scenarios, this disparity might be more pronounced, given that the HF simulations were modified in this study to expedite the process of surrogate model development.
 %
-\begin{figure}[H]\centering
+\begin{figure}\centering
 \includegraphics[trim={0cm 0.5cm 0cm 0cm},clip,width=7cm]{comparison.pdf}
 \caption{Representation of the relative decrease in runtime for HF simulations compared to LF simulations. This data is obtained by calculating the ratio of the runtime reductions to the runtimes of the LF simulations.\label{fig:runtime-comparison}}
 \end{figure}
@@ -1095,7 +1094,7 @@ For 3D model 4, the size of training and validation datasets was increased by a 
 
 To further interpret the performance disparity observed between the models, Fig.~\ref{fig:visualization} presents a comparative analysis of the \ac{pmse} contours, applied to a reference state of one cartilage substructure. The first three ML models displayed suboptimal performance across various points, whereas their \ac{hml} counterparts achieved significantly higher accuracy levels, with minimal pointwise error outliers (evidenced by sparse small red areas). The fourth \ac{ml} model exhibited comparable accuracy levels to the \ac{hml} model, with minor differences. However, in this inefficient surrogate modeling scenario, there was also a greater frequency of pointwise errors, suggesting a preference for the other more efficient \ac{hml} models. Again, this analysis emphasizes the benefits of adopting \ac{hml} modeling techniques, particularly in scenarios with limited data availability.
 %
-\begin{figure}[H]\centering
+\begin{figure}\centering
 \includegraphics[trim={4.8cm 16.5cm 15cm 5cm},clip,width=1\linewidth,height=0.9\textheight,keepaspectratio]{visualization_3d.pdf}
 \caption{Illustration of PMSE contours for all three-dimensional surrogate models.}\label{fig:visualization}
 \end{figure}
@@ -1133,9 +1132,40 @@ Chapter text
 \subsection{Efficient and Generalizable learning}
 %
 
+\begin{figure}\centering
+\includegraphics[width=1\linewidth,keepaspectratio]{knee_inductive.png}
+\caption{Example of a graph node, shown in red, interacting with neighboring nodes, shown in blue, within a numerical cartilage model.}\label{fig:knee_inductive}
+\end{figure}
+
+\begin{figure}\centering
+\includegraphics[width=1\linewidth,keepaspectratio]{inductive.png}
+\caption{Illustration of the role of different models at different scales in surrogate modeling.}\label{fig:inductive}
+\end{figure}
+
+\begin{figure}\centering
+\includegraphics[width=0.8\linewidth,keepaspectratio]{augmentation.png}
+\caption{Sample of data augmentation in the spatial and temporal domains.}\label{fig:augmentation}
+\end{figure}
+
+\begin{figure}\centering
+\includegraphics[width=\linewidth,keepaspectratio]{training_loop.png}
+\caption{Main stages of the customized training loop.}\label{fig:training_loop}
+\end{figure}
 
 \subsection{Simulation Tests}
 %
+
+\begin{sidewaysfigure}
+    \centering
+    \includegraphics[width=\textheight,keepaspectratio]{normalization.png}
+    \caption{Comparison of various preprocessing transformations on the nodal input and output features.}
+    \label{fig:normalization}
+\end{sidewaysfigure}
+
+\begin{figure}\centering
+\includegraphics[width=0.6\linewidth,keepaspectratio]{experiment.png}
+\caption{Data flow during machine learning training and experimentation.}\label{fig:experiment}
+\end{figure}
 
 \section{Results and Discussion}
 %
@@ -1144,13 +1174,34 @@ Chapter text
 \label{tabel:runtimes_stats}
 \begin{tabular}{lcc}
 \toprule
- & Small-scale simulation & Large-scale simulation \\
+ & \textbf{Small-scale simulation} & \textbf{Large-scale simulation} \\
 \midrule
 HF model & 21.21 ± 2.16 & 118.31 ± 6.42 \\
 LF model & 1.31 ± 0.69 & 3.07 ± 0.27 \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+
+\begin{figure}\centering
+\includegraphics[width=1\linewidth,keepaspectratio]{gnn.pdf}
+\caption{Comparative analysis of validation errors across training epochs for the models without AE.}\label{fig:gnn}
+\end{figure}
+
+\begin{figure}\centering
+\includegraphics[width=1\linewidth,keepaspectratio]{combined.pdf}
+\caption{Comparative analysis of validation errors across training epochs for the models with AE.}\label{fig:combined}
+\end{figure}
+
+\begin{figure}\centering
+\includegraphics[width=1\linewidth,keepaspectratio]{3d_boxplot.pdf}
+\caption{Averaged out-of-distribution testing errors for various models trained using different loss functions.}\label{fig:3d_boxplot}
+\end{figure}
+
+\begin{figure}\centering
+\includegraphics[width=1\linewidth,keepaspectratio]{3d_inductive.jpg}
+\caption{Averaged pointwise out-of-distribution testing errors for various models trained using different loss functions. Illustrated values are from zero (shown in blue) to beyond 2 (shown in red).}\label{fig:3d_inductive}
+\end{figure}
 
 \chapter{Conclusion}
 
