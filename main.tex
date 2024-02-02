@@ -1,23 +1,13 @@
-\documentclass[12pt,a4paper]{report}
-
-%\documentclass[14pt,a4paper]{extreport}
-
+\input{common_preamble}
 \usepackage[titletoc]{appendix}
 \usepackage{enumitem}
 \usepackage{calc}
-\usepackage{setspace}
-%\usepackage{multicol}
 \usepackage{rotating}
 
-\onehalfspacing % Adjusted line spacing
-
-\usepackage[utf8]{inputenc}
 \usepackage[style=authoryear, sorting=nyt, maxcitenames=1]{biblatex}
 \usepackage{amsmath}
-\usepackage[hidelinks]{hyperref}
 \usepackage{amssymb}
 \usepackage{upgreek}
-\usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{bm}
 \usepackage{titlesec}
@@ -26,51 +16,8 @@
 \usepackage{fancyhdr} % For custom headers and footers
 \renewcommand{\contentsname}{Table of Contents}
 \graphicspath{{img/}}
-
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    citecolor=blue,
-    urlcolor=blue,
-}
-
 \usepackage{float} % for figure placement
-
-% acronyms
-\usepackage[nolist,nohyperlinks]{acronym}
-\acrodef{2d}[2D]{two-dimensional}
-\acrodef{gpu}[GPU]{graphics processing unit}
-\acrodef{ai}[AI]{artificial inteligence}
-\acrodef{3d}[3D]{three-dimensional}
-\acrodef{ac}[AC]{articular cartilage}
-\acrodef{ae}[AE]{autoencoder}
-\acrodef{cpu}[CPU]{central processing unit}
-\acrodef{cr}[CR]{compression ratio}
-\acrodef{da}[DA]{data augmentation}
-\acrodef{dl}[DL]{deep learning}
-\acrodef{dz}[DZ]{deep zone}
-\acrodef{ml}[ML]{machine learning}
-\acrodef{mo}[MO]{material optimization}
-\acrodef{mor}[MOR]{model order reduction}
-\acrodef{mse}[MSE]{mean squared error}
-\acrodef{mz}[MZ]{middle zone}
-\acrodef{fe}[FE]{finite element}
-\acrodef{ffnn}[FFNN]{feed-forward neural network}
-\acrodef{fpbbs}[FPBBS]{fixed-point-based backward scheme}
-\acrodef{gnn}[GNN]{graph neural network}
-\acrodef{hf}[HF]{high-fidelity}
-\acrodef{rom}[ROM]{reduced-order modeling}
-\acrodef{hml}[HML]{hybrid \ac{ml}}
-\acrodef{lf}[LF]{low-fidelity}
-\acrodef{pmse}[PMSE]{pointwise \ac{mse}}
-\acrodef{psa}[PSA]{pre-stressing algorithm}
-\acrodef{sz}[SZ]{superficial zone}
-%
-
 \addbibresource{ref.bib}
-
-% Adjust the page dimensions
-\geometry{top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm}
 
 \begin{document}
 
@@ -80,7 +27,7 @@
     \textsc{FREE UNIVERSITY OF BOZEN-BOLZANO}\par
     \textsc{FACULTY OF ENGINEERING}\par
     \vspace{2.5cm}
-    {\LARGE\bfseries Hybrid Machine Learning and Numerical Analysis of Cartilage Biomechanics\par}
+    {\LARGE\bfseries \input{title}\par}
     \vspace{2cm}
     A dissertation submitted in partial fulfillment\par
     of the requirements for the degree of\par
@@ -111,7 +58,10 @@
 
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
-To be added...
+
+\input{abstract}
+
+\bigskip
 
 \noindent
 \textbf{Keywords}: Articular cartilage, knee biomechanics, finite element analysis, surrogate modeling, machine learning.
@@ -462,7 +412,7 @@ where, $\rho_{\rm C}^I$ represents the volume fraction of pertinent fibrils and 
     \varphi \in \left \{\phi^{\rm S}, \: \rho^{\rm COL} \right \}.
 \end{equation}
 %
-Now, the total stress in the collagen fibrils at all directions, expressed as $\boldsymbol{\sigma}^{\rm COL}$ can be determined by \cite{wilson2004a}:
+Now, the total stress in the collagen fibrils at all directions, expressed as $\boldsymbol{\sigma}^{\rm COL}$ can be determined by [\cite{wilson2004a}]:
 %
 \begin{equation}\label{eq-fibril_stress}
     \boldsymbol{\sigma}^{\rm COL} = \sum_{I=1}^9 \sigma^I \mathbf{n}^I \otimes \mathbf{n}^I,
@@ -1026,7 +976,7 @@ Utilizing optimized computational code, e.g., through \ac{gpu} acceleration, can
 
 \paragraph{Data-efficient learning.} The challenge of small training sets in surrogate modeling can be effectively tackled by integrating physical laws and domain-specific insights into the training methodology. Such integration, as shown by \cite{kashinath2021,linka2021,hoerig2020}, has been shown to enhance performance even with limited data. These methods, despite their evident success, are still evolving and require meticulous design and complex coding. Often, they introduce new constraints to the training, such as loss function penalization in standard learning algorithms. Challenges particularly arise in dealing with multi-physics scenarios and discontinuities in mechanical models, as discussed in \cite{coutinho2023,cai2021b,karniadakis2021,fuks2020}.
 
-Another approach to manage limited data involves simplifying the numerical model to focus on key information, thus reducing the number of necessary parameters. This method is exemplified in studies by \cite{pellicer-valero2020,niroomandi2012}. The efficiency gains from such \ac{mor} methods have sparked interest in various domains, e.g., the virtual reality applications in surgical simulations [\cite{cueto2014}]. However, these methods also present challenges in implementation, as noted in the \cite{lauzeral2019} study. Considering this, multi-fidelity methods in the \ac{mor} offer an alternative, potentially implemented with non-destructive methods (without directly affecting the numerical solvers). These techniques have shown promising results across different fields, implemented with diverse \ac{ml} methods [\cite{ahn2022,zhang2022,cheng2021,yang2019}].
+Another approach to managing limited data involves simplifying the numerical model to focus on key information, thus reducing the number of necessary parameters. This method is exemplified in studies by \cite{pellicer-valero2020,niroomandi2012}. The efficiency gains from such \ac{mor} methods have sparked interest in various domains, e.g., the virtual reality applications in surgical simulations [\cite{cueto2014}]. However, these methods also present challenges in implementation, as noted in the \cite{lauzeral2019} study. Considering this, multi-fidelity methods in the \ac{mor} offer an alternative, potentially implemented with non-destructive methods (without directly affecting the numerical solvers). These techniques have shown promising results across different fields, implemented with diverse \ac{ml} methods [\cite{ahn2022,zhang2022,cheng2021,yang2019}].
 
 A prevalent strategy in multi-fidelity \ac{mor}-based surrogate modeling involves using an \ac{lf} model in conjunction with an \ac{ml} model to enhance the \ac{lf} output accuracy, as detailed by \cite{peherstorfer2018}. Such models have found applications in diverse fields using various \ac{lf} modeling implementations [\cite{zhang2021,zhou2017}]. However, to our knowledge, no implementation has been done using \ac{lf} modeling for multi-physics soft tissue models, like cartilage, as proposed in our study. The proposed approach utilizes an \ac{lf} numerical part that simplifies the multi-physics equations, focusing on the tissue's approximate behavior. The accuracy of the \ac{lf} outcomes is then enhanced through an \ac{ml} model to match the \ac{hf} model's precision with non-destructive \ac{hml} implementation.
 
@@ -1189,7 +1139,7 @@ The effectiveness of our \ac{hml} in single-scale, few-shot learning has been de
 
 Nonetheless, a primary challenge in training graph neural networks lies in their requirement for extensive message-passing steps, which can lead to prolonged training periods and the oversmoothing issue in downstream layers, where they become mostly identical and useless [\cite{zhang2024}]. A solution lies in limiting the message-passing iterations by adopting multi-level mesh resolutions, as extensively researched [\cite{cao2023,fortunato2022,li2020}]. Our hypothesis posits that the \ac{hml} technique could mitigate this challenge without relying on such complex input meshes. Additionally, we integrate an upstream \ac{ae} in our custom memory-efficient training loop, a widely adopted technique in surrogate modeling for tasks like reduced-order modeling or feature denoising [\cite{fresca2022,pant2021,fresca2021}], to possibly accelerate the training of our multiscale cartilage surrogate model.
 
-\paragraph{Augmented graph data.} \ac{da}, the process of synthetically generating new data, is critical when dealing with limited datasets. Common augmentation methods include the application of generative models, noise addition, and the application of problem-related transformations such as rotations to the image data [\cite{mumuni2022}]. Such techniques have shown notable efficacy in enhancing model performance, particularly in physics applications where configuration-dependent tensors are utilized [\cite{cheung2023}]. Alternatively, the Mixup technique, involving the convex combination of sample pairs to interpolate new data, is another widely adopted method across various domains, including imaging [\cite{guo2019,zhang2018}], natural language processing [\cite{jindal2020,guo2020}], and graph data [\cite{han2022,wang2021}]. However, its application in graph classification rather than regression problems like surrogate modeling is limited, an area where our technique offers a novel solution.
+\paragraph{Augmented graph data.} \ac{da}, the process of synthetically generating new data, is critical when dealing with limited datasets. Common augmentation methods include the application of generative models, noise addition, and the application of problem-related transformations such as rotations to the image data [\cite{mumuni2022}]. Such techniques have shown notable efficacy in enhancing model performance, particularly in physics applications where configuration-dependent tensors are utilized [\cite{cheung2023}]. Alternatively, the Mixup technique, involving the convex combination of sample pairs to interpolate new data, is another widely adopted method across various domains, including imaging [\cite{guo2019,zhang2018}], natural language processing [\cite{jindal2020,guo2020}], and graph data [\cite{han2022,wang2021}]. However, it has been mostly applied to graph classification rather than regression problems like surrogate modeling, an area where our technique offers a novel solution.
 
 In the physics context, innovative, problem-specific augmentation techniques have been developed. More specifically, \cite{zhao2021} introduced a method in temperature prediction that exponentially increases training data by applying pairwise differences instead of absolute values. \cite{parida2023a} also augmented earthquake signals using a discrete wavelet transform method, creating new samples by perturbing the wavelet coefficients of original signals. Additionally, many surrogate models trained on image-based snapshots, e.g., [\cite{dong2022}]; thus employed random rotations to ensure orientation invariance, and in some multi-fidelity studies, e.g., [\cite{sella2023}], \ac{lf} training samples directly augment datasets. Our research particularly augments datasets for multiscale surrogate modeling without any large-scale data, a novel approach in this context.
 
@@ -1376,9 +1326,11 @@ To summarize, we proposed and empirically tested an extended \ac{hml} framework 
 %
 This work attempted to provide a multi-physics numerical and data-driven model of knee cartilage with implementation efficiency. At the heart of this study was the development of an efficient, generalizable, and scalable surrogate modeling framework, trained on a multiphasic model of cartilage across various scales and fidelities. Then, surrogate models were developed with the assumption of limited training data, as \ac{hf} biomechanical models might be too expensive to generate the data. By integrating state-of-the-art \ac{ml} and \ac{fe} analysis, we sought to overcome these challenges and developed 4 research questions in this regard.
 
-Addressing the first research question, "How can a complex multi-physics model of cartilage biomechanics be implemented efficiently enough to generate the required training datasets?", we successfully implemented a complex multi-physics model of cartilage biomechanics with a fully automated \ac{psa}, optimized for efficient subsequent \ac{hf} dataset generation. This model was designed with a focus on balancing computational efficiency with the numerical fidelity necessary to capture the heterogeneous and multiphasic nature of cartilage tissue. Besides, the key to efficiently generating the training datasets was found in the strategic simplification of our multi-physics cartilage model, used subsequently in a \ac{hml} method.
+Addressing the first research question, ``How can a complex multi-physics model of cartilage biomechanics be implemented efficiently enough to generate the required training datasets?'', we successfully implemented a complex multi-physics model of cartilage biomechanics with a fully automated \ac{psa}, optimized for efficient subsequent \ac{hf} dataset generation. This model was designed with a focus on balancing computational efficiency with the numerical fidelity necessary to capture the heterogeneous and multiphasic nature of cartilage tissue. Besides, the key to efficiently generating the training datasets was found in the strategic simplification of our multi-physics cartilage model, used subsequently in a \ac{hml} method.
 
-In light of the third research question, "Is the new machine learning system scalable and generalizable across different scales?", we expanded the scope of our study to encompass multiscale simulations. The scalability and generalizability of our \ac{hml} framework were rigorously tested by employing it in both tissue-scale and knee-scale simulations. We tested the integration of an upstream \ac{ae} model, along with the application of various preprocessing and customization algorithms, to evaluate their effects on performance. Our findings suggest that the augmented \ac{hml} framework, combined with \acp{gnn}, can effectively learn from small-scale data and generalize its knowledge to larger, more complex simulations, thereby answering positively this question.
+The second research question, ``How can machine learning techniques be integrated into the numerical model for efficient surrogate modeling?'', was addressed through the development of a novel hybrid multi-fidelity learning framework. It combines the \ac{lf} (reduced-order) numerical analysis with model-agnostic supervised \ac{ml} techniques. The cornerstone of this integration was the creation of surrogate models that are trained on a limited number of \ac{hf} numerical samples. The surrogate models developed showcased a significant reduction in computational time compared to traditional numerical methods, achieving the goal of efficient surrogate modeling. This integration of \ac{ml} into our numerical model is a leap forward in the field, especially in the context of cartilage biomechanics.
+
+In light of the third research question, ``Is the new machine learning system scalable and generalizable across different scales'', we expanded the scope of our study to encompass multiscale simulations. The scalability and generalizability of our \ac{hml} framework were rigorously tested by employing it in both tissue-scale and knee-scale simulations. We tested the integration of an upstream \ac{ae} model, along with the application of various preprocessing and customization algorithms, to evaluate their effects on performance. Our findings suggest that the augmented \ac{hml} framework, combined with \acp{gnn}, can effectively learn from small-scale data and generalize its knowledge to larger, more complex simulations, thereby answering positively this question.
 
 Addressing the final research question, ``What are the potential implications of the proposed methods for future research?'', we believe that our proposed methods can significantly contribute to future development due to their non-intrusive implementation of advanced cartilage biomechanics. Our \ac{hf} pre-stressed and multi-physics cartilage model can be efficiently implemented since it is based on a combination of regular nonlinear \ac{fe} and a \ac{fpbbs}. The data-driven extensions also are based on widely adopted \ac{dl} algorithms, again with efficient execution and fast training. Additionally, as similar models are extensively developed in biomechanics, the implications of this research are far-reaching, potentially providing a new template for efficiently implementing simulations without sacrificing constitutive complexity.
 
@@ -1396,7 +1348,7 @@ To conclude, we summarize our main original contributions, which were empiricall
     \item Extension of the hybrid model with a set of relatively efficient algorithms, particularly physics-based \ac{da}, permitting multiscale surrogate modeling, implemented by using \acp{gnn}.
 \end{enumerate}
 %
-Furthermore, our research transcends its initial biomechanical application, showcasing a harmonious blend of learnable AI with traditional numerical analysis, while emphasizing the balance between efficiency and complexity under limited resources.
+Furthermore, our research may transcend its initial biomechanical application, showcasing a harmonious blend of learnable AI with traditional numerical analysis, while emphasizing the balance between efficiency and complexity under limited resources.
 
 % References
 \printbibliography[title={References}, heading=bibintoc]
